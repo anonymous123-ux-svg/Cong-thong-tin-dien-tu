@@ -19,11 +19,11 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ["192.168.95.128", "192.168.95.128:3000", "192.168.95.128:3001"],
+      allowedOrigins: ["localhost:3000", "192.168.95.128:3000", "192.168.95.133:3000"],
     },
   },
   // Allow hot-reloading from external network interfaces
-  allowedDevOrigins: ["192.168.95.128", "192.168.95.128:3000", "192.168.95.128:3001"],
+  allowedDevOrigins: ["localhost:3000", "192.168.95.128:3000", "192.168.95.133:3000"],
 };
 
 export default nextConfig;
