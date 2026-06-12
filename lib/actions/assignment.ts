@@ -38,7 +38,12 @@ export type AssignmentInput = {
 }
 
 export async function getAssignments(): Promise<UIAssignment[]> {
+  // Filter assignments by the currently logged-in user
+  const session = await auth();
+  const userId = (session?.user as any)?.id;
+
   const data = await prisma.assignment.findMany({
+    where: userId ? { creatorId: userId } : {},
     orderBy: { dueDate: 'desc' }
   })
 
@@ -97,12 +102,15 @@ export async function createAssignment(data: any) {
   const baseMetadata = { systemGenerated: true, dueTime } as Record<string, any>;
   deepMerge(baseMetadata, meta);
 
+  const userId = (session.user as any)?.id;
+
   const dbAssignment = await prisma.assignment.create({
     data: {
       title,
       courseId: "mock-course-phy402",
       dueDate: new Date(dueDate + "T" + (dueTime || "00:00:00") + "Z"),
-      metadata: baseMetadata
+      metadata: baseMetadata,
+      creatorId: userId || null,
     }
   })
 

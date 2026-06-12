@@ -51,19 +51,20 @@ This lab is designed to train students in:
 |-------|--------------|----------|--------|
 | 1 | **IDOR** | `lib/actions/user.ts` | Modify any user's profile by manipulating `userId` parameter |
 | 2 | **Mass Assignment** | `lib/actions/user.ts` | Escalate role from `STUDENT` → `LECTURER` via unsanitized `deepMerge()` |
-| 3 | **Command Injection (RCE)** | `app/api/assignments/route.ts` | Execute arbitrary shell commands via unsanitized `logCommand` field passed to `exec()` |
+| 3 | **Prototype Pollution → RCE** | `app/api/assignments/route.ts` | `__proto__` payload via `deepMerge()` injects `logCommand` into object tree → `exec()` → Reverse Shell |
 
 ### Supporting Vulnerable Components
 
 | Component | File | Description |
 |-----------|------|-------------|
 | `deepMerge()` | `lib/utils/unsafeMerge.ts` | Recursive object merge with NO sanitization of `__proto__`, `constructor`, or `prototype` keys |
-| Assignment API | `app/api/assignments/route.ts` | REST endpoint that extracts `logCommand` from JSON body and passes it directly to `child_process.exec()` |
+| Assignment API | `app/api/assignments/route.ts` | REST endpoint using `JSON.parse` + `deepMerge`. Attacker's `__proto__.logCommand` is merged into metadata, then found by `extractConfigValue()` and passed to `exec()` |
+| `extractConfigValue()` | `app/api/assignments/route.ts` | Walks entire object tree (including `__proto__` subtrees) to find config values — the RCE gadget |
 | User Profile Action | `lib/actions/user.ts` | Server Action that allows role escalation to LECTURER (blocks ADMIN only) |
 
 ### Security Note: React 19 Built-in Protection
 
-React 19's `decodeReply()` function (used by Server Actions) automatically strips `__proto__` keys from incoming data. This means **Prototype Pollution via Server Actions is NOT possible** on Next.js 16. The Command Injection vulnerability in this lab uses a separate REST API endpoint (`/api/assignments`) that bypasses this protection by using standard `JSON.parse`.
+React 19's `decodeReply()` function (used by Server Actions) automatically strips `__proto__` keys from incoming data. This means **Prototype Pollution via Server Actions (`POST /lecturer/assignments`) is NOT possible** on Next.js 16. The attacker must discover the REST API endpoint (`POST /api/assignments`) which uses standard `JSON.parse` — preserving `__proto__` keys and enabling the Prototype Pollution → RCE chain via `deepMerge()`.
 
 ## Architecture
 
@@ -82,7 +83,7 @@ app/
     dashboard/       → Student portal
     settings/        → Profile settings (Mass Assignment entry point)
   api/
-    assignments/     → 🔴 VULNERABLE REST API (Command Injection)
+    assignments/     → 🔴 VULNERABLE REST API (Prototype Pollution → RCE)
     test-register/   → Test endpoint for registration
 
 components/
@@ -129,12 +130,8 @@ git clone <repo-url> && cd e-learning-ui
 # 2. Install dependencies
 npm install
 
-# 3. Start PostgreSQL
-docker run -d --name postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_DB=elearning \
-  -p 5432:5432 postgres
+# 3. Start PostgreSQL (via docker-compose)
+docker compose up -d
 
 # 4. Configure environment
 cp .env.example .env

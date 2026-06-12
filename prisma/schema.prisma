@@ -7,10 +7,11 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(cuid())
-  email        String @unique
+  id           String       @id @default(cuid())
+  email        String       @unique
   passwordHash String
   role         Role
+  assignments  Assignment[]
 }
 
 model Course {
@@ -21,11 +22,13 @@ model Course {
 }
 
 model Assignment {
-  id       String   @id @default(cuid())
-  title    String
-  courseId String
-  dueDate  DateTime
-  metadata Json?
+  id        String   @id @default(cuid())
+  title     String
+  courseId  String
+  dueDate   DateTime
+  metadata  Json?
+  creatorId String?
+  creator   User?    @relation(fields: [creatorId], references: [id])
 }
 
 model Enrollment {
