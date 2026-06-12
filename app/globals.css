@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@supports (scrollbar-gutter: stable) {
+  html,
+  body {
+    scrollbar-gutter: stable;
+  }
+}
+
+body {
+  background: #f9f9ff;
+  color: #151c27;
+  font-family: var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Skeleton shimmer (used by route-level loading UI) */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+/* Hide scrollbars while keeping scroll (used by schedule date row) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Auto-hide scrollbars: hidden by default, visible while scrolling */
+.autohide-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.autohide-scrollbar.is-scrolling::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}

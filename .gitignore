@@ -1,0 +1,51 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next.js build output
+/.next/
+/out/
+
+# production
+/build
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# env files (RẤT QUAN TRỌNG)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# testing
+/coverage
+
+# misc
+*.pem
+
+# debug
+*.log
+
+# lock files (tuỳ team, thường giữ lại)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+/lib/generated/prisma
