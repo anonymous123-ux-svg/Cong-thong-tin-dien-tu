@@ -14,6 +14,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       role: string
+      hoTen?: string | null
     } & DefaultSession["user"]
   }
 }
@@ -31,19 +32,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null
         }
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string }
+          where: { email: credentials.email as string },
         })
         if (!user) return null
-        
+
         const passwordsMatch = await bcrypt.compare(
           credentials.password as string,
           user.passwordHash
         )
         if (passwordsMatch) {
-          return { id: user.id, email: user.email, role: user.role }
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.hoTen,
+            role: user.role,
+          }
         }
         return null
-      }
-    })
+      },
+    }),
   ],
 })

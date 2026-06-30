@@ -1,18 +1,30 @@
-import RegisterHero from "@/components/auth/register/RegisterHero"
-import RegisterForm from "@/components/auth/register/RegisterForm"
+import PortalHeader from "@/components/portal/PortalHeader"
+import PortalFooter from "@/components/portal/PortalFooter"
+import RegisterForm from "@/components/portal/RegisterForm"
+import EmblemStar from "@/components/portal/EmblemStar"
 
 export default function RegisterPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#f9f9ff] p-6">
+    <div className="flex min-h-screen flex-col">
+      <PortalHeader />
 
-      <div className="w-full max-w-6xl flex flex-col md:flex-row bg-white rounded-[2rem] shadow-sm overflow-hidden">
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="mb-6 flex flex-col items-center text-center">
+            <EmblemStar size={56} />
+            <h1 className="mt-3 text-xl font-bold text-slate-800">
+              Đăng ký tài khoản
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Tạo tài khoản công dân để sử dụng dịch vụ công trực tuyến.
+            </p>
+          </div>
 
-        <RegisterHero />
+          <RegisterForm />
+        </div>
+      </main>
 
-        <RegisterForm />
-
-      </div>
-
-    </main>
+      <PortalFooter />
+    </div>
   )
 }

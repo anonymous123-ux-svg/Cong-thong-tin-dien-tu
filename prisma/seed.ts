@@ -3,98 +3,79 @@ import { Pool } from "pg"
 import { PrismaPg } from "@prisma/adapter-pg"
 import bcrypt from "bcryptjs"
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/elearning" })
+const pool = new Pool({
+  connectionString:
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/dichvucong",
+})
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
+  await prisma.hoSo.deleteMany({})
   await prisma.user.deleteMany({})
-  await prisma.assignment.deleteMany({})
-  await prisma.course.deleteMany({})
 
   const passwordHash = await bcrypt.hash("password123", 10)
 
-  // Seed default users
+  // Tài khoản cán bộ quản trị
   await prisma.user.create({
     data: {
-      email: "admin@elearning.com",
+      email: "canbo@dichvucong.gov.vn",
+      hoTen: "Nguyễn Văn Cán Bộ",
       passwordHash,
-      role: "ADMIN"
-    }
+      role: "CAN_BO",
+    },
   })
 
-  await prisma.user.create({
+  // Tài khoản công dân mẫu (dùng để đăng nhập và tra cứu)
+  const congDan = await prisma.user.create({
     data: {
-      email: "lecturer@elearning.com",
+      email: "congdan@dichvucong.gov.vn",
+      hoTen: "Trần Thị Công Dân",
       passwordHash,
-      role: "LECTURER"
-    }
+      role: "CONG_DAN",
+    },
   })
 
-  await prisma.user.create({
-    data: {
-      email: "student@elearning.com",
-      passwordHash,
-      role: "STUDENT"
-    }
-  })
-  
-  const course = await prisma.course.create({
-    data: {
-      id: "mock-course-phy402",
-      title: "Advanced Physics PHY-402",
-      description: "Advanced Physics module",
-      instructorId: "inst-1"
-    }
-  })
-
-  const seed = [
+  // Hồ sơ dịch vụ công mẫu
+  const seedHoSo = [
     {
-      id: "a1",
-      title: "Quantum Entanglement Lab",
-      courseId: course.id,
-      dueDate: new Date("2023-10-24T23:59:00Z"),
-      metadata: {
-        module: "Module 04: Non-locality",
-        type: "Lab",
-        dueTime: "23:59",
-        submissionsDone: 84,
-        submissionsTotal: 128,
-        status: "Published"
-      }
+      maHoSo: "000.00.01.H29-240115-0001",
+      thuTuc: "Cấp đổi giấy phép lái xe",
+      coQuan: "Sở Giao thông Vận tải",
+      linhVuc: "Giao thông vận tải",
+      nguoiNop: "Trần Thị Công Dân",
+      tinhTrang: "Đã trả kết quả",
+      ngayTiepNhan: new Date("2026-01-15T08:30:00Z"),
+      ngayHenTra: new Date("2026-01-22T17:00:00Z"),
+      ownerId: congDan.id,
     },
     {
-      id: "a2",
-      title: "Bell's Inequality Derivation",
-      courseId: course.id,
-      dueDate: new Date("2023-10-28T23:59:00Z"),
-      metadata: {
-        module: "Module 03: Foundations",
-        type: "Homework",
-        dueTime: "23:59",
-        submissionsDone: 15,
-        submissionsTotal: 128,
-        status: "Published"
-      }
+      maHoSo: "000.00.01.H29-260310-0420",
+      thuTuc: "Đăng ký khai sinh",
+      coQuan: "UBND Phường Bến Nghé",
+      linhVuc: "Tư pháp - Hộ tịch",
+      nguoiNop: "Trần Thị Công Dân",
+      tinhTrang: "Đang xử lý",
+      ngayTiepNhan: new Date("2026-03-10T09:15:00Z"),
+      ngayHenTra: new Date("2026-03-13T17:00:00Z"),
+      ownerId: congDan.id,
     },
     {
-      id: "a3",
-      title: "Mid-Term Assessment Phase II",
-      courseId: course.id,
-      dueDate: new Date("2023-11-05T10:00:00Z"),
-      metadata: {
-        module: "General Proficiency",
-        type: "Quiz",
-        dueTime: "10:00",
-        submissionsDone: 0,
-        submissionsTotal: 128,
-        status: "Draft"
-      }
-    }
+      maHoSo: "000.00.01.H29-260520-1188",
+      thuTuc: "Cấp giấy chứng nhận quyền sử dụng đất",
+      coQuan: "Văn phòng Đăng ký đất đai",
+      linhVuc: "Đất đai",
+      nguoiNop: "Lê Văn A",
+      tinhTrang: "Chờ bổ sung hồ sơ",
+      ngayTiepNhan: new Date("2026-05-20T14:00:00Z"),
+      ngayHenTra: new Date("2026-06-20T17:00:00Z"),
+      ownerId: null,
+    },
   ]
 
-  for (const s of seed) {
-    await prisma.assignment.create({ data: s })
+  for (const h of seedHoSo) {
+    await prisma.hoSo.create({ data: h })
   }
 
   console.log("Seeding finished.")

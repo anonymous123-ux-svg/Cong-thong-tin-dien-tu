@@ -12,12 +12,13 @@ export async function registerAccount(formData: FormData) {
   try {
     const email = formData.get("email")?.toString().trim();
     const password = formData.get("password")?.toString();
+    const hoTen = formData.get("hoTen")?.toString().trim() || null;
 
     if (!email || !password) {
       return { error: "Vui lòng điền đầy đủ email và mật khẩu." };
     }
 
-    // Check if email already exists
+    // Kiểm tra email đã tồn tại chưa
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -26,17 +27,18 @@ export async function registerAccount(formData: FormData) {
       return { error: "Email đã được sử dụng. Vui lòng chọn email khác." };
     }
 
-    // Hash password
+    // Băm mật khẩu
     const bcrypt = await import("bcryptjs");
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create user and ENFORCE STUDENT role
+    // Tạo tài khoản, BẮT BUỘC vai trò CONG_DAN (công dân)
     await prisma.user.create({
       data: {
         email,
+        hoTen,
         passwordHash,
-        role: "STUDENT", // ENFORCED ROLE
+        role: "CONG_DAN", // ENFORCED ROLE
       },
     });
 

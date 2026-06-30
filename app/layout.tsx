@@ -4,12 +4,13 @@ import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
 });
 
 export const metadata: Metadata = {
-  title: "Task Management | The Academic Curator",
-  description: "The Academic Curator — Task management dashboard",
+  title: "Cổng Dịch vụ công",
+  description:
+    "Cổng Dịch vụ công — Kết nối, cung cấp thông tin và dịch vụ công mọi lúc, mọi nơi.",
 };
 
 export default function RootLayout({
@@ -19,19 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="vi"
       className={`${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200"
-        />
-      </head>
-      <body
-        className={`${inter.className} min-h-screen bg-background text-on-surface`}
-      >
+      <body className={`${inter.className} min-h-screen bg-[#f4f6fb] text-slate-800`}>
         {children}
       </body>
     </html>

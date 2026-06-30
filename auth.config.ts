@@ -4,6 +4,10 @@ import type { NextAuthConfig } from "next-auth"
  * Edge-compatible auth config (no Node.js-only imports).
  * Used by middleware to validate sessions without importing pg/bcrypt.
  * Full provider config with DB logic lives in auth.ts.
+ *
+ * Routing model for the Cổng Dịch vụ công portal:
+ *  - Public routes: "/", "/login", "/register"
+ *  - Everything else (including the vulnerable "/tra-cuu" lookup) requires login.
  */
 export const authConfig = {
   pages: {
@@ -12,29 +16,23 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const isPublicRoute = nextUrl.pathname === "/login" || nextUrl.pathname === "/" || nextUrl.pathname === "/register"
-      const role = (auth?.user as { role?: string })?.role
+      const isPublicRoute =
+        nextUrl.pathname === "/" ||
+        nextUrl.pathname === "/login" ||
+        nextUrl.pathname === "/register"
 
-      if (isPublicRoute) {
+      // Already authenticated users skip the auth pages and go to lookup.
+      if (nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {
         if (isLoggedIn) {
-          if (role === "STUDENT") return Response.redirect(new URL("/student/dashboard", nextUrl))
-          if (role === "LECTURER") return Response.redirect(new URL("/lecturer/dashboard", nextUrl))
-          return Response.redirect(new URL("/admin/dashboard", nextUrl))
+          return Response.redirect(new URL("/tra-cuu", nextUrl))
         }
         return true
       }
 
-      if (!isLoggedIn) return false
+      if (isPublicRoute) return true
 
-      if (role === "STUDENT") {
-        if (nextUrl.pathname.startsWith("/admin") || nextUrl.pathname.startsWith("/lecturer")) {
-          return Response.redirect(new URL("/student/dashboard", nextUrl))
-        }
-      } else if (role === "LECTURER") {
-        if (nextUrl.pathname.startsWith("/admin") || nextUrl.pathname.startsWith("/student")) {
-          return Response.redirect(new URL("/lecturer/dashboard", nextUrl))
-        }
-      }
+      // Protected routes (e.g. /tra-cuu) — citizens must be logged in.
+      if (!isLoggedIn) return false
 
       return true
     },

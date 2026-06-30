@@ -40,6 +40,7 @@ Thumbs.db
 
 # misc
 *.pem
+cookies.txt
 
 # debug
 *.log

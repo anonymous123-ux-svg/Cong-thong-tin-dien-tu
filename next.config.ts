@@ -8,10 +8,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-      {
-        protocol: "https",
         hostname: "i.pravatar.cc",
       },
       {
@@ -22,13 +18,15 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
+      // Vulnerable surface: Server Actions are reachable from these origins.
       allowedOrigins,
     },
   },
-  // Allow hot-reloading from external network interfaces
-  // allowedDevOrigins: allowedOrigins,
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
 };
 

@@ -7,49 +7,31 @@ datasource db {
 }
 
 model User {
-  id           String       @id @default(cuid())
-  email        String       @unique
+  id           String  @id @default(cuid())
+  email        String  @unique
+  hoTen        String?
   passwordHash String
-  role         Role
-  assignments  Assignment[]
+  role         Role    @default(CONG_DAN)
+  hoSo         HoSo[]
 }
 
-model Course {
-  id           String @id @default(cuid())
-  title        String
-  description  String
-  instructorId String
-}
-
-model Assignment {
-  id        String   @id @default(cuid())
-  title     String
-  courseId  String
-  dueDate   DateTime
-  metadata  Json?
-  creatorId String?
-  creator   User?    @relation(fields: [creatorId], references: [id])
-}
-
-model Enrollment {
-  id         String   @id @default(cuid())
-  studentId  String
-  courseId   String
-  enrolledAt DateTime @default(now())
-}
-
-model Submission {
+// Hồ sơ dịch vụ công (dossier) — tra cứu sau khi đăng nhập
+model HoSo {
   id           String   @id @default(cuid())
-  assignmentId String
-  studentId    String
-  fileUrl      String
-  submittedAt  DateTime @default(now())
-  grade        Float?
-  metadata     Json?
+  maHoSo       String   @unique
+  thuTuc       String
+  coQuan       String
+  linhVuc      String
+  nguoiNop     String
+  tinhTrang    String
+  ngayTiepNhan DateTime
+  ngayHenTra   DateTime
+  ownerId      String?
+  owner        User?    @relation(fields: [ownerId], references: [id])
 }
 
 enum Role {
-  STUDENT
-  LECTURER
+  CONG_DAN
+  CAN_BO
   ADMIN
 }
