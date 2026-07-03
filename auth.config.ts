@@ -24,8 +24,12 @@ export const authConfig = {
         nextUrl.pathname === "/" ||
         nextUrl.pathname === "/login" ||
         nextUrl.pathname === "/register" ||
+        nextUrl.pathname === "/admin/login" ||
         nextUrl.pathname === "/dich-vu-cong" ||
-        nextUrl.pathname === "/phan-anh-kien-nghi"
+        nextUrl.pathname === "/phan-anh-kien-nghi" ||
+        // Thư mục backup bị lộ ("nhạy cảm") — cố ý cho truy cập ẩn danh để
+        // học viên dò/tải file bằng ffuf/gobuster. Đây là lỗ hổng chủ đích.
+        nextUrl.pathname.startsWith("/backup")
 
       // Already authenticated users skip the auth pages and go to lookup.
       if (nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {
@@ -36,6 +40,14 @@ export const authConfig = {
       }
 
       if (isPublicRoute) return true
+
+      // Khu vực quản trị: khách chưa đăng nhập → về trang đăng nhập quản trị
+      // riêng (/admin/login), không dùng trang đăng nhập công dân. Kiểm tra
+      // vai trò ADMIN được thực thi trong app/admin/(dashboard)/layout.tsx.
+      if (nextUrl.pathname.startsWith("/admin")) {
+        if (!isLoggedIn) return Response.redirect(new URL("/admin/login", nextUrl))
+        return true
+      }
 
       // Protected routes (e.g. /tra-cuu) — citizens must be logged in.
       if (!isLoggedIn) return false

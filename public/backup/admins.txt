@@ -1,0 +1,6 @@
+# Tai khoan co quyen quan tri (ADMIN) - dung cho trang /admin/login
+admin@dichvucong.gov.vn
+# Tai khoan dich vu noi bo (FTP/SSH) - tham khao them tai /admin/dich-vu-noi-bo
+svc_deploy      -> app-backend.dichvucong.lab:22 (SSH)
+svc_db_admin    -> db-internal.dichvucong.lab:22 (SSH)
+svc_hoso_ftp    -> ftp-noibo.dichvucong.lab:21 (FTP)

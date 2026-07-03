@@ -1,0 +1,11 @@
+# Cong Dich vu cong - backup danh sach tai khoan (export tu he thong)
+# File: users.txt
+# Generated: 2026-06-28 02:14 (+07)
+# CANH BAO: file backup nay KHONG duoc phep public ra Internet.
+#
+# email                              | ho ten                    | vai tro
+admin@dichvucong.gov.vn              | Quan tri vien he thong    | ADMIN
+canbo@dichvucong.gov.vn              | Nguyen Van Can Bo         | CAN_BO
+congdan@dichvucong.gov.vn            | Tran Thi Cong Dan         | CONG_DAN
+hotro@dichvucong.gov.vn              | To Ho tro Ky thuat        | CAN_BO
+levana@dichvucong.gov.vn             | Le Van A                  | CONG_DAN

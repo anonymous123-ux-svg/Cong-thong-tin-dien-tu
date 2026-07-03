@@ -21,10 +21,11 @@ const navItems = [
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await auth()
   if (!session?.user) {
-    redirect("/login")
+    redirect("/admin/login")
   }
   if (session.user.role !== "ADMIN") {
-    redirect("/")
+    // Đăng nhập nhưng không phải ADMIN → trả về trang đăng nhập quản trị kèm cảnh báo.
+    redirect("/admin/login?error=forbidden")
   }
 
   return (
