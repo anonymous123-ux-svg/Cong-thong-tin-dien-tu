@@ -6,8 +6,12 @@ import type { NextAuthConfig } from "next-auth"
  * Full provider config with DB logic lives in auth.ts.
  *
  * Routing model for the Cổng Dịch vụ công portal:
- *  - Public routes: "/", "/login", "/register"
- *  - Everything else (including the vulnerable "/tra-cuu" lookup) requires login.
+ *  - Public routes: "/", "/login", "/register", "/dich-vu-cong", "/phan-anh-kien-nghi"
+ *  - Everything else (including the vulnerable "/tra-cuu" lookup and "/admin") requires login.
+ *  - "/admin" additionally requires the ADMIN role — that finer-grained check is enforced
+ *    in app/admin/layout.tsx (not here), so an authenticated non-admin gets a 403 instead of
+ *    being bounced back to /login. Note "/admin" is intentionally NOT linked from any nav —
+ *    it is only reachable if discovered (e.g. via directory fuzzing with gobuster/ffuf).
  */
 export const authConfig = {
   pages: {
@@ -19,7 +23,9 @@ export const authConfig = {
       const isPublicRoute =
         nextUrl.pathname === "/" ||
         nextUrl.pathname === "/login" ||
-        nextUrl.pathname === "/register"
+        nextUrl.pathname === "/register" ||
+        nextUrl.pathname === "/dich-vu-cong" ||
+        nextUrl.pathname === "/phan-anh-kien-nghi"
 
       // Already authenticated users skip the auth pages and go to lookup.
       if (nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {

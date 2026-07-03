@@ -6,7 +6,7 @@ import EmblemStar from "./EmblemStar"
 export default async function PortalHeader({
   active,
 }: {
-  active?: "home" | "tra-cuu"
+  active?: "home" | "tra-cuu" | "dich-vu-cong" | "phan-anh-kien-nghi"
 }) {
   const session = await auth()
   const user = session?.user
@@ -31,8 +31,13 @@ export default async function PortalHeader({
           <Link href="/" className="flex items-center gap-3">
             <EmblemStar size={48} />
             <div className="leading-tight">
-              <div className="text-lg sm:text-xl font-bold uppercase tracking-wide">
-                Cổng Dịch vụ công
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="text-lg sm:text-xl font-bold uppercase tracking-wide">
+                  Cổng Dịch vụ công
+                </div>
+                <span className="rounded bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#7a3b00]">
+                  Phiên bản diễn tập ATTT
+                </span>
               </div>
               <div className="text-[11px] sm:text-xs text-blue-100">
                 Kết nối, cung cấp thông tin và dịch vụ công mọi lúc, mọi nơi
@@ -97,12 +102,22 @@ export default async function PortalHeader({
           >
             Tra cứu hồ sơ
           </Link>
-          <span className="px-4 py-2.5 font-medium text-blue-200/70 cursor-default">
+          <Link
+            href="/dich-vu-cong"
+            className={`px-4 py-2.5 font-medium hover:bg-white/10 transition ${
+              active === "dich-vu-cong" ? "bg-white/15" : ""
+            }`}
+          >
             Dịch vụ công trực tuyến
-          </span>
-          <span className="px-4 py-2.5 font-medium text-blue-200/70 cursor-default">
+          </Link>
+          <Link
+            href="/phan-anh-kien-nghi"
+            className={`px-4 py-2.5 font-medium hover:bg-white/10 transition ${
+              active === "phan-anh-kien-nghi" ? "bg-white/15" : ""
+            }`}
+          >
             Phản ánh kiến nghị
-          </span>
+          </Link>
         </div>
       </nav>
     </header>

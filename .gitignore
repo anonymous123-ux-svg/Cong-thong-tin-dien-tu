@@ -50,3 +50,6 @@ cookies.txt
 # yarn.lock
 # pnpm-lock.yaml
 /lib/generated/prisma
+
+# tệp tải lên qua "Phản ánh kiến nghị" (lab — không commit nội dung người dùng gửi)
+/public/uploads/

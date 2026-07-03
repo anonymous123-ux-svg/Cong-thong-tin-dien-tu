@@ -7,12 +7,14 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  email        String  @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   hoTen        String?
   passwordHash String
-  role         Role    @default(CONG_DAN)
+  role         Role          @default(CONG_DAN)
   hoSo         HoSo[]
+  phanAnh      PhanAnh[]
+  dichVuNoiBo  DichVuNoiBo[]
 }
 
 // Hồ sơ dịch vụ công (dossier) — tra cứu sau khi đăng nhập
@@ -34,4 +36,42 @@ enum Role {
   CONG_DAN
   CAN_BO
   ADMIN
+}
+
+// Phản ánh kiến nghị — công dân gửi phản ánh kèm tệp đính kèm (không giới hạn định dạng)
+model PhanAnh {
+  id            String   @id @default(cuid())
+  tieuDe        String
+  noiDung       String
+  hoTen         String?
+  email         String?
+  tenTepDinhKem String?
+  duongDanTep   String?
+  trangThai     String   @default("MOI")
+  createdAt     DateTime @default(now())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+}
+
+// Danh mục dịch vụ công trực tuyến hiển thị công khai
+model DichVu {
+  id      String  @id @default(cuid())
+  ten     String
+  coQuan  String
+  linhVuc String
+  moTa    String?
+  mucDo   String  @default("Mức độ 4")
+}
+
+// Thông tin kết nối dịch vụ nội bộ (FTP/SSH) theo từng người dùng — chỉ ADMIN mới xem được
+model DichVuNoiBo {
+  id         String  @id @default(cuid())
+  loaiDichVu String
+  hostname   String
+  port       Int
+  username   String
+  matKhau    String
+  ghiChu     String?
+  userId     String?
+  user       User?   @relation(fields: [userId], references: [id])
 }
