@@ -6,7 +6,7 @@
 Ứng dụng mô phỏng **Cổng Dịch vụ công** (tham khảo trang Tra cứu hồ sơ của Cổng Dịch vụ công Quốc gia), được vũ khí hóa làm mục tiêu Red Team.
 
 *   **Framework:** Next.js 15.0.3 (React 19.0.0-rc) — *cố ý dính CVE-2025-55182*
-*   **Database:** PostgreSQL (Prisma 7.8.0 + `@prisma/adapter-pg`)
+*   **Database:** PostgreSQL (Prisma 6.19.3 + `@prisma/adapter-pg`)
 *   **Auth:** NextAuth v5 (Credentials + bcryptjs)
 *   **Routing/RBAC:** `middleware.ts` + `auth.config.ts`
 

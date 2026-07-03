@@ -19,7 +19,7 @@ PostgreSQL (port 5432)
 
 **Stack:**
 - PostgreSQL 16 (Docker hoặc bare-metal)
-- Prisma 7.8.0 + `@prisma/adapter-pg` (driver-based adapter)
+- Prisma 6.19.3 + `@prisma/adapter-pg` (driver-based adapter)
 - Không dùng Prisma Migrate truyền thống — schema được push qua `prisma db push`
 
 ---

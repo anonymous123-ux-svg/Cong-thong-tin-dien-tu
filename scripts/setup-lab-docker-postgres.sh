@@ -68,10 +68,15 @@ set_env "DB_INTERNAL_HOST" "172.20.0.5"
 set_env "DB_USER" "readonly_auditor"
 set_env "DB_PASS" "Learning@2026!"
 
+# React 19-rc xung dot peer voi @welldone-software/why-did-you-render (peer react@^19),
+# nen bat buoc dung --legacy-peer-deps. Prisma da ghim ^6.19.3 (ho tro Node >=18.18).
 if [ ! -d node_modules ]; then
-  info "Installing npm dependencies"
-  npm install
+  info "Installing npm dependencies (React RC -> --legacy-peer-deps)"
+  npm install --legacy-peer-deps
 fi
+
+info "Generating Prisma Client"
+npx prisma generate
 
 info "Starting PostgreSQL with Docker Compose"
 docker compose up -d db
