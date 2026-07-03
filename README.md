@@ -53,7 +53,7 @@ Mục **Phản ánh kiến nghị** (`/phan-anh-kien-nghi`, công khai, không c
 | Framework | Next.js (App Router) | **15.0.3 (Vulnerable)** |
 | UI Library | React | **19.0.0-rc (Vulnerable)** |
 | Language | TypeScript (strict) | 5.x |
-| Styling | Tailwind CSS | 4.x |
+| Styling | Tailwind CSS | 3.4.x |
 | Database | PostgreSQL via Prisma | 6.19.3 |
 | Auth | NextAuth (Credentials) | v5 beta |
 
