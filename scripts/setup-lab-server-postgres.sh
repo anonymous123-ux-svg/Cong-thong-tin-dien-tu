@@ -99,7 +99,8 @@ info "Generating Prisma Client"
 npx prisma generate
 
 info "Checking database connection through Prisma"
-if ! npx prisma db execute --stdin <<SQL
+# Prisma 6.x yeu cau --url (hoac --schema) cho `db execute`; khong tu lay url tu config file.
+if ! npx prisma db execute --url "$DATABASE_URL" --stdin <<SQL
 SELECT 1;
 SQL
 then
