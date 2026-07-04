@@ -1,20 +1,22 @@
 #!/bin/bash
-# Setup Apache + Node.js + Next.js deployment
-# Este script configura o servidor web Apache para executar a aplicação Next.js
+# Setup apenas do Apache (proxy reverso para o Next.js)
+# Este script configura SOMENTE o servidor web Apache.
+# A aplicação Next.js deve ser iniciada manualmente com `npm run dev`
+# (o Apache faz proxy da porta 80 para a porta 3000).
 
 set -e
 
 # Diretório do projeto = diretório onde este script está (funciona em qualquer host)
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "[*] Iniciando setup do Apache + Next.js..."
+echo "[*] Iniciando setup do Apache..."
 echo "[*] Diretório do projeto: ${PROJECT_DIR}"
 
 # Atualizar sistema
 echo "[*] Atualizando repositórios do sistema..."
 apt-get update -y
 
-# Instalar Apache2 e módulos necessários
+# Instalar Apache2
 echo "[*] Instalando Apache2..."
 apt-get install -y apache2
 
@@ -24,19 +26,6 @@ a2enmod proxy_http
 a2enmod rewrite
 a2enmod headers
 a2enmod autoindex   # necessário para a listagem de diretório em /backup
-
-# Instalar Node.js e npm (se não estiver instalado)
-if ! command -v node &> /dev/null; then
-    echo "[*] Instalando Node.js e npm..."
-    apt-get install -y curl
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    apt-get install -y nodejs
-fi
-
-# Instalar dependências do projeto
-echo "[*] Instalando dependências do projeto..."
-cd "$PROJECT_DIR"
-npm install
 
 # Publicar os arquivos de "backup" expostos (vulnerabilidade simulada)
 echo "[*] Publicando diretório /backup exposto..."
@@ -66,7 +55,7 @@ cat > /etc/apache2/sites-available/nextjs-app.conf << 'EOF'
     # Excluir /backup do proxy para o Next.js (precisa vir ANTES do ProxyPass /)
     ProxyPass /backup !
 
-    # Proxy para a aplicação Next.js
+    # Proxy para a aplicação Next.js (iniciada manualmente com `npm run dev`)
     ProxyPreserveHost On
     ProxyPass / http://127.0.0.1:3000/
     ProxyPassReverse / http://127.0.0.1:3000/
@@ -95,47 +84,10 @@ apache2ctl configtest
 echo "[*] Reiniciando Apache..."
 systemctl restart apache2
 
-# Rodar a aplicação Next.js em modo dev como serviço systemd
-# (o "npm start"/"next start" exige um build de produção que falha
-# nesta versão custom do Next.js; "next dev" funciona direto do código-fonte)
-echo "[*] Configurando serviço systemd para 'npm run dev'..."
-RUN_USER="${SUDO_USER:-root}"
-NODE_BIN_DIR="$(dirname "$(command -v node)")"
-
-cat > /etc/systemd/system/nextjs-lab.service << EOF
-[Unit]
-Description=Next.js lab app (npm run dev)
-After=network.target
-
-[Service]
-Type=simple
-User=${RUN_USER}
-WorkingDirectory=${PROJECT_DIR}
-Environment=PATH=${NODE_BIN_DIR}:/usr/bin:/bin
-Environment=PORT=3000
-ExecStart=$(command -v npm) run dev
-Restart=on-failure
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-systemctl enable --now nextjs-lab
-
-echo "[*] Aguardando a aplicação subir em 127.0.0.1:3000..."
-for i in $(seq 1 30); do
-    if curl -s -o /dev/null "http://127.0.0.1:3000/"; then
-        echo "[+] Next.js respondendo em 127.0.0.1:3000!"
-        break
-    fi
-    sleep 1
-done
-
 echo "[+] Apache configurado com sucesso na porta 80!"
-echo "[+] Aplicação Next.js rodando via systemd (serviço 'nextjs-lab')"
 echo ""
-echo "Comandos úteis:"
-echo "  sudo systemctl status nextjs-lab"
-echo "  sudo journalctl -u nextjs-lab -f"
+echo "Próximo passo: inicie a aplicação manualmente no diretório do projeto:"
+echo "  cd ${PROJECT_DIR}"
+echo "  npm run dev"
+echo ""
+echo "O Apache fará o proxy da porta 80 para a aplicação na porta 3000."
