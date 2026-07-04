@@ -19,13 +19,11 @@ Todos os scripts necessários para transformar este repositório em um lab de se
 ### Opção 1: Automático Completo (Recomendado)
 ```bash
 sudo bash setup-full-lab.sh
-npm start
 ```
 
 ### Opção 2: Via Makefile
 ```bash
 sudo make setup
-make start
 ```
 
 ### Opção 3: Manual
@@ -33,7 +31,6 @@ make start
 sudo bash setup-webserver.sh    # ~5 min
 sudo bash setup-ssh.sh          # ~1 min
 bash extract-credentials.sh     # ~1 min
-npm start                        # rodar em terminal separado
 ```
 
 ## ✨ O Que Cada Script Faz
@@ -44,9 +41,9 @@ npm start                        # rodar em terminal separado
 ✓ Habilita módulos: proxy, proxy_http, rewrite, headers
 ✓ Instala Node.js v20 + npm
 ✓ npm install no projeto
-✓ npm run build (Next.js)
 ✓ Configura Virtual Host para proxy em porta 80
 ✓ Proxifica requests para http://127.0.0.1:3000
+✓ Sobe a app com 'npm run dev' via serviço systemd (nextjs-lab)
 ```
 
 **Resultado**: Apache ouve na **porta 80** e proxifica para Next.js
@@ -174,7 +171,7 @@ Isto é **propositalmente vulnerável** para fins de aprendizado.
 | Componente | Porta | Recurso | Status |
 |-----------|-------|---------|--------|
 | Apache | 80 | ~10MB RAM | systemctl status apache2 |
-| Next.js | 3000 | ~200MB RAM | npm start |
+| Next.js | 3000 | ~200MB RAM | systemctl status nextjs-lab |
 | SSH | 22 | ~5MB RAM | systemctl status ssh |
 
 **Total aproximado**: ~500MB RAM em uso
@@ -222,7 +219,7 @@ make test
 |----------|---------|
 | "Permission denied" | Use `sudo` antes do comando |
 | Apache não responde | `sudo systemctl restart apache2` |
-| Next.js não inicia | `npm install` então `npm start` |
+| Next.js não inicia | `sudo journalctl -u nextjs-lab -f` |
 | SSH falha | `sudo systemctl restart ssh` |
 | Bruteforce não funciona | Execute `extract-credentials.sh` primeiro |
 
@@ -245,7 +242,7 @@ sudo journalctl -u ssh -f
 
 ```bash
 # Tudo em uma linha
-sudo bash setup-full-lab.sh && npm start && make test
+sudo bash setup-full-lab.sh && make test
 ```
 
 **Tempo total**: ~10-15 minutos (dependendo de internet para npm install)

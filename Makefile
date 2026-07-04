@@ -16,7 +16,7 @@ help:
 	@echo "  $(YELLOW)extract$(NC)            - Extrair credenciais expostas do /backup"
 	@echo "  $(YELLOW)test$(NC)               - Testar configuração do lab"
 	@echo "  $(YELLOW)bruteforce$(NC)         - Executar bruteforce SSH"
-	@echo "  $(YELLOW)start$(NC)              - Iniciar aplicação (npm start)"
+	@echo "  $(YELLOW)start$(NC)              - Iniciar aplicação (serviço nextjs-lab)"
 	@echo "  $(YELLOW)stop$(NC)               - Parar aplicação"
 	@echo "  $(YELLOW)status$(NC)             - Ver status dos serviços"
 	@echo "  $(YELLOW)logs$(NC)               - Ver logs do setup"
@@ -31,10 +31,9 @@ help:
 setup: check-root
 	@echo "$(GREEN)[*] Executando setup completo do lab...$(NC)"
 	@sudo bash setup-full-lab.sh
-	@echo "$(GREEN)[+] Setup concluído!$(NC)"
+	@echo "$(GREEN)[+] Setup concluído! Aplicação já está rodando (serviço nextjs-lab)$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Próximos passos:$(NC)"
-	@echo "  make start          - Iniciar a aplicação"
 	@echo "  make test           - Testar configuração"
 	@echo ""
 
@@ -60,13 +59,12 @@ bruteforce:
 	@bash bruteforce-ssh.sh localhost 22
 
 start:
-	@echo "$(GREEN)[*] Iniciando aplicação Next.js...$(NC)"
-	@npm start
+	@echo "$(GREEN)[*] Iniciando aplicação Next.js (nextjs-lab)...$(NC)"
+	@sudo systemctl start nextjs-lab
 
 stop:
 	@echo "$(YELLOW)[*] Parando serviços...$(NC)"
-	@pkill -f "npm start" || true
-	@pkill -f "node" || true
+	@sudo systemctl stop nextjs-lab || true
 	@echo "$(GREEN)[+] Serviços parados.$(NC)"
 
 status:
@@ -78,8 +76,8 @@ status:
 	@echo "SSH:"
 	@sudo systemctl status ssh --no-pager | grep "Active:" || echo "  Desativado"
 	@echo ""
-	@echo "Next.js (porta 3000):"
-	@lsof -i :3000 >/dev/null 2>&1 && echo "  ✓ Rodando" || echo "  ✗ Parado"
+	@echo "Next.js (nextjs-lab):"
+	@sudo systemctl status nextjs-lab --no-pager | grep "Active:" || echo "  Desativado"
 	@echo ""
 	@echo "Apache Proxy (porta 80):"
 	@curl -s -o /dev/null -w "  HTTP Status: %{http_code}\n" http://localhost/ || echo "  ✗ Não respondendo"

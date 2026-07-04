@@ -45,9 +45,11 @@ sudo bash setup-ssh.sh
 bash extract-credentials.sh
 ```
 
-### Passo 4: Iniciar Aplicação
+### Passo 4: Aplicação já está rodando
+O `setup-webserver.sh` sobe a aplicação automaticamente via `npm run dev`
+como serviço systemd (`nextjs-lab`). Não é necessário rodar `npm start`.
 ```bash
-npm start
+sudo systemctl status nextjs-lab
 ```
 
 ## 🧪 Testes e Exploração
@@ -200,12 +202,12 @@ sudo systemctl restart apache2
 
 ### Next.js não está rodando
 ```bash
-# Verificar se npm start foi executado
-lsof -i :3000
+# Verificar o serviço systemd
+sudo systemctl status nextjs-lab
+sudo journalctl -u nextjs-lab -f
 
-# Iniciar manualmente
-cd /home/dpr-beo/REACT2SHELL-WEB-VULN
-npm start
+# Reiniciar manualmente
+sudo systemctl restart nextjs-lab
 ```
 
 ### SSH não está funcionando

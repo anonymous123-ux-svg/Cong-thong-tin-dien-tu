@@ -38,10 +38,6 @@ echo "[*] Instalando dependências do projeto..."
 cd "$PROJECT_DIR"
 npm install
 
-# Build da aplicação Next.js
-echo "[*] Fazendo build da aplicação Next.js..."
-npm run build
-
 # Publicar os arquivos de "backup" expostos (vulnerabilidade simulada)
 echo "[*] Publicando diretório /backup exposto..."
 BACKUP_SRC="$PROJECT_DIR/public/backup"
@@ -99,9 +95,47 @@ apache2ctl configtest
 echo "[*] Reiniciando Apache..."
 systemctl restart apache2
 
+# Rodar a aplicação Next.js em modo dev como serviço systemd
+# (o "npm start"/"next start" exige um build de produção que falha
+# nesta versão custom do Next.js; "next dev" funciona direto do código-fonte)
+echo "[*] Configurando serviço systemd para 'npm run dev'..."
+RUN_USER="${SUDO_USER:-root}"
+NODE_BIN_DIR="$(dirname "$(command -v node)")"
+
+cat > /etc/systemd/system/nextjs-lab.service << EOF
+[Unit]
+Description=Next.js lab app (npm run dev)
+After=network.target
+
+[Service]
+Type=simple
+User=${RUN_USER}
+WorkingDirectory=${PROJECT_DIR}
+Environment=PATH=${NODE_BIN_DIR}:/usr/bin:/bin
+Environment=PORT=3000
+ExecStart=$(command -v npm) run dev
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now nextjs-lab
+
+echo "[*] Aguardando a aplicação subir em 127.0.0.1:3000..."
+for i in $(seq 1 30); do
+    if curl -s -o /dev/null "http://127.0.0.1:3000/"; then
+        echo "[+] Next.js respondendo em 127.0.0.1:3000!"
+        break
+    fi
+    sleep 1
+done
+
 echo "[+] Apache configurado com sucesso na porta 80!"
-echo "[+] Próximo passo: Iniciar a aplicação Next.js com 'npm start'"
+echo "[+] Aplicação Next.js rodando via systemd (serviço 'nextjs-lab')"
 echo ""
-echo "Para iniciar manualmente a aplicação:"
-echo "  cd $PROJECT_DIR"
-echo "  npm start"
+echo "Comandos úteis:"
+echo "  sudo systemctl status nextjs-lab"
+echo "  sudo journalctl -u nextjs-lab -f"
