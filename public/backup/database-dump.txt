@@ -1,0 +1,6 @@
+# Trích xuất một phần bảng ho_so (dữ liệu demo, đã ẩn thông tin nhạy cảm)
+ma_ho_so,tieu_de,trang_thai,ngay_tao
+HS-2026-0001,Cap doi giay khai sinh,dang_xu_ly,2026-06-30
+HS-2026-0002,Dang ky tam tru,hoan_thanh,2026-07-01
+HS-2026-0003,Xac nhan cu tru,tu_choi,2026-07-02
+HS-2026-0004,Cap phieu ly lich tu phap,dang_xu_ly,2026-07-03

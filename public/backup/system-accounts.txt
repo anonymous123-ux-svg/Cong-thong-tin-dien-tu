@@ -1,0 +1,18 @@
+=========================================================
+  TÀI KHOẢN QUẢN TRỊ MÁY CHỦ (SSH) - system-accounts.txt
+=========================================================
+# Đây là tài khoản ĐĂNG NHẬP MÁY CHỦ qua SSH (cổng 22).
+# Chỉ dành cho quản trị viên. TUYỆT ĐỐI không chia sẻ.
+
+Host      : react2shell-lab (localhost)
+Dịch vụ   : OpenSSH Server, cổng 22
+
+Tài khoản quản trị (admin) của hệ thống:
+
+    username : dpradmin
+    quyen    : sudo / quan_tri_he_thong
+    ghi_chu  : Tai khoan admin chinh cua repo/may chu.
+               Mat khau chua duoc ghi o day vi ly do bao mat.
+
+# Nhắc nhở nội bộ: mật khẩu vẫn đang dùng loại "dễ nhớ" -
+# cần đổi sang mật khẩu mạnh trước khi đưa vào vận hành thật.

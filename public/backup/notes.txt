@@ -1,0 +1,6 @@
+Ghi chú vận hành máy chủ
+------------------------
+- Máy chủ web: Apache2 (proxy -> Next.js cổng 3000)
+- Truy cập quản trị hệ thống qua SSH (cổng 22).
+- Tài khoản đăng nhập máy chủ được liệt kê trong file: system-accounts.txt
+- Nhắc: đổi mật khẩu mặc định sau khi bàn giao (VẪN CHƯA LÀM - cần xử lý gấp!).

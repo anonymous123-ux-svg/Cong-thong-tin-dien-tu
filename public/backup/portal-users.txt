@@ -1,0 +1,9 @@
+# Danh sách tài khoản NGƯỜI DÙNG cổng dịch vụ công (web portal)
+# Đây là tài khoản đăng nhập ứng dụng web, KHÔNG phải tài khoản máy chủ.
+id,username,ho_ten,vai_tro
+1001,canbo,Nguyen Van Can,can_bo
+1002,congdan,Tran Thi Cong,cong_dan
+1003,hotro,Le Van Ho,ho_tro
+1004,levana,Le Van A,cong_dan
+1005,quantri,Pham Quan Tri,quan_tri_noi_bo
+1006,tiepnhan,Vo Thi Tiep,can_bo
