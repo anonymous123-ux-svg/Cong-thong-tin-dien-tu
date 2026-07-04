@@ -4,7 +4,11 @@
 
 set -e
 
+# Diretório do projeto = diretório onde este script está (funciona em qualquer host)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "[*] Iniciando setup do Apache + Next.js..."
+echo "[*] Diretório do projeto: ${PROJECT_DIR}"
 
 # Atualizar sistema
 echo "[*] Atualizando repositórios do sistema..."
@@ -31,7 +35,7 @@ fi
 
 # Instalar dependências do projeto
 echo "[*] Instalando dependências do projeto..."
-cd /home/dpr-beo/REACT2SHELL-WEB-VULN
+cd "$PROJECT_DIR"
 npm install
 
 # Build da aplicação Next.js
@@ -40,7 +44,7 @@ npm run build
 
 # Publicar os arquivos de "backup" expostos (vulnerabilidade simulada)
 echo "[*] Publicando diretório /backup exposto..."
-BACKUP_SRC="/home/dpr-beo/REACT2SHELL-WEB-VULN/public/backup"
+BACKUP_SRC="$PROJECT_DIR/public/backup"
 BACKUP_WEB="/var/www/backup"
 mkdir -p "$BACKUP_WEB"
 cp -f "$BACKUP_SRC"/*.txt "$BACKUP_WEB"/ 2>/dev/null || true
@@ -99,5 +103,5 @@ echo "[+] Apache configurado com sucesso na porta 80!"
 echo "[+] Próximo passo: Iniciar a aplicação Next.js com 'npm start'"
 echo ""
 echo "Para iniciar manualmente a aplicação:"
-echo "  cd /home/dpr-beo/REACT2SHELL-WEB-VULN"
+echo "  cd $PROJECT_DIR"
 echo "  npm start"
