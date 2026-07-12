@@ -11,7 +11,7 @@ set -e
 # Username này chính là tài khoản admin bị lộ trong /backup/system-accounts.txt
 ADMIN_USER="dpradmin"
 # Mật khẩu nằm trong wordlist rockyou.txt -> red team brute-force được.
-ADMIN_PASS="sunshine"
+ADMIN_PASS="arsenal"
 
 echo "[*] Iniciando setup do OpenSSH Server..."
 

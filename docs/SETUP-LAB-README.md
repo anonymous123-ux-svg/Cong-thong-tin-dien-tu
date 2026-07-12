@@ -136,7 +136,7 @@ que faz parte da wordlist **rockyou.txt** — ou seja, é quebrável por brute-f
 
 | Username   | Password   | Observação                                   |
 |------------|------------|----------------------------------------------|
-| `dpradmin` | `sunshine` | Membro de `sudo`; senha presente no rockyou  |
+| `dpradmin` | `arsenal`  | Membro de `sudo`; senha presente no rockyou  |
 
 > O **username** não é entregue de graça: ele fica exposto no arquivo
 > `http://localhost/backup/system-accounts.txt`. A **senha** precisa ser

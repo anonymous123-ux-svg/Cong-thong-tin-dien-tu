@@ -43,6 +43,11 @@ cat > /etc/apache2/sites-available/nextjs-app.conf << 'EOF'
     ServerName localhost
     ServerAdmin admin@localhost
 
+    # --- UTF-8: exibe corretamente conteúdo em português/vietnamita ---
+    # Envia "; charset=UTF-8" para a listagem /backup e para os arquivos .txt.
+    AddDefaultCharset UTF-8
+    AddCharset UTF-8 .txt
+
     # --- Diretório /backup EXPOSTO (vulnerabilidade: directory listing) ---
     # Servido diretamente pelo Apache (fora do proxy) com listagem habilitada.
     Alias /backup /var/www/backup
