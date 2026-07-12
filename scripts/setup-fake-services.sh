@@ -66,59 +66,116 @@ import threading
 import sys
 import signal
 
-# port -> banner giả (thứ nmap đọc để đoán dịch vụ). Danh sách rộng, các port
-# đang mở sẵn trên server (22/80/3000/...) sẽ tự bị skip khi bind thất bại.
+def _http(status, headers, body=b"", version=b"1.1", close=True):
+    """Dựng một HTTP response hợp lệ (có Content-Length) để nmap -sV đọc ra
+    Server/version rõ ràng thay vì đoán mò. close=False bỏ header Connection
+    (cần cho vài chữ ký nmap yêu cầu Content-Length ngay trước body)."""
+    lines = [b"HTTP/" + version + b" " + status]
+    lines += headers
+    lines.append(b"Content-Length: %d" % len(body))
+    if close:
+        lines.append(b"Connection: close")
+    return b"\r\n".join(lines) + b"\r\n\r\n" + body
+
+
+# Reply kiểu Redis INFO: nmap khớp "redis_version:" -> hiện đúng version.
+_REDIS_INFO = (
+    b"# Server\r\nredis_version:7.0.11\r\nredis_mode:standalone\r\n"
+    b"os:Linux 6.6.0 x86_64\r\narch_bits:64\r\n"
+)
+_REDIS = b"$%d\r\n%s\r\n" % (len(_REDIS_INFO), _REDIS_INFO)
+
+# Body JSON của Elasticsearch (nmap khớp "You Know, for Search" + number).
+_ES_BODY = (
+    b'{\n  "name" : "es-node-01",\n  "cluster_name" : "elasticsearch",\n'
+    b'  "cluster_uuid" : "kQ3lE1n2Rf6wSx9pZ0aBcd",\n'
+    b'  "version" : {\n    "number" : "7.17.9",\n'
+    b'    "build_flavor" : "default",\n    "build_type" : "deb",\n'
+    b'    "lucene_version" : "8.11.1",\n'
+    b'    "minimum_wire_compatibility_version" : "6.8.0",\n'
+    b'    "minimum_index_compatibility_version" : "6.0.0-beta1"\n  },\n'
+    b'  "tagline" : "You Know, for Search"\n}\n'
+)
+# nmap khớp Elasticsearch REST API: BẮT BUỘC "HTTP/1.0" và Content-Length phải
+# đứng NGAY trước body (không chèn Connection ở giữa).
+_ES = _http(b"200 OK",
+            [b"content-type: application/json; charset=UTF-8"],
+            _ES_BODY, version=b"1.0", close=False)
+
+# Reply "stats" của Memcached: nmap khớp "STAT version X" -> hiện đúng version.
+_MEMCACHED = (
+    b"STAT pid 2114\r\nSTAT uptime 360421\r\nSTAT time 1700000000\r\n"
+    b"STAT version 1.6.18\r\nSTAT pointer_size 64\r\nEND\r\n"
+)
+
+# port -> banner giả CÓ VERSION (thứ nmap -sV đọc để đoán dịch vụ + phiên bản).
+# Danh sách rộng; port đang mở sẵn (22/80/3000/...) sẽ tự bị skip khi bind lỗi.
+# Ghi chú: giao thức nhị phân/TLS thuần (SMB/LDAP/RDP/Oracle/HTTPS...) không thể
+# giả version chỉ bằng banner tĩnh nên để trống -> nmap sẽ hiện tcpwrapped.
 DEFAULT_SERVICES = {
     21:    b"220 (vsFTPd 3.0.5)\r\n",                              # FTP
-    23:    b"\xff\xfd\x18\xff\xfd\x1f Ubuntu login: ",            # Telnet
-    25:    b"220 mail.local ESMTP Postfix\r\n",                    # SMTP
-    53:    b"",                                                     # DNS (mở port)
-    110:   b"+OK POP3 ready\r\n",                                  # POP3
-    111:   b"",                                                     # rpcbind
-    135:   b"",                                                     # MSRPC
-    139:   b"",                                                     # NetBIOS
-    143:   b"* OK IMAP4rev1 Service Ready\r\n",                    # IMAP
-    389:   b"",                                                     # LDAP
-    443:   b"",                                                     # HTTPS
-    445:   b"",                                                     # SMB
-    465:   b"220 mail.local ESMTP\r\n",                            # SMTPS
-    587:   b"220 mail.local ESMTP Postfix\r\n",                    # Submission
-    993:   b"",                                                     # IMAPS
-    995:   b"",                                                     # POP3S
-    1433:  b"",                                                     # MSSQL
-    1521:  b"",                                                     # Oracle
-    2049:  b"",                                                     # NFS
-    2181:  b"",                                                     # Zookeeper
+    23:    b"\xff\xfd\x18\xff\xfd\x1f Ubuntu 22.04.3 LTS login: ", # Telnet
+    25:    b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n",  # SMTP
+    53:    b"",                                                     # DNS (nhị phân)
+    110:   b"+OK Dovecot (Ubuntu) ready.\r\n",                     # POP3
+    111:   b"",                                                     # rpcbind (RPC)
+    135:   b"",                                                     # MSRPC (nhị phân)
+    139:   b"",                                                     # NetBIOS (nhị phân)
+    143:   b"* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+] Dovecot (Ubuntu) ready.\r\n",  # IMAP
+    389:   b"",                                                     # LDAP (nhị phân)
+    443:   b"",                                                     # HTTPS (TLS)
+    445:   b"",                                                     # SMB (nhị phân)
+    465:   b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n", # SMTPS
+    587:   b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n", # Submission
+    993:   b"",                                                     # IMAPS (TLS)
+    995:   b"",                                                     # POP3S (TLS)
+    1433:  b"",                                                     # MSSQL (nhị phân)
+    1521:  b"",                                                     # Oracle (nhị phân)
+    2049:  b"",                                                     # NFS (RPC)
+    2181:  b"Zookeeper version: 3.7.1-standalone, built on 2023-01-15\n",  # Zookeeper
     3306:  b"\x4a\x00\x00\x00\x0a5.7.42-log\x00",                  # MySQL
-    3389:  b"",                                                     # RDP
-    5432:  b"",                                                     # PostgreSQL
-    5601:  b"HTTP/1.1 200 OK\r\nServer: kibana\r\n\r\n",           # Kibana
+    3389:  b"",                                                     # RDP (nhị phân)
+    5432:  b"",                                                     # PostgreSQL (nhị phân)
+    5601:  _http(b"302 Found", [b"location: /login?next=%2F",
+                                b"kbn-name: kibana",
+                                b"kbn-version: 7.17.9",
+                                b"content-type: text/html; charset=utf-8"]),  # Kibana
     5900:  b"RFB 003.008\n",                                       # VNC
-    5985:  b"",                                                     # WinRM
-    6379:  b"-ERR unknown command\r\n",                            # Redis
-    8080:  b"HTTP/1.1 200 OK\r\nServer: nginx/1.24.0\r\n\r\n",     # HTTP-alt
-    8443:  b"",                                                     # HTTPS-alt
-    9000:  b"",                                                     # PHP-FPM / misc
-    9092:  b"",                                                     # Kafka
-    9200:  b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n",  # Elasticsearch
-    11211: b"",                                                     # Memcached
-    15672: b"HTTP/1.1 200 OK\r\nServer: RabbitMQ\r\n\r\n",         # RabbitMQ mgmt
-    27017: b"",                                                     # MongoDB
+    5985:  _http(b"404 Not Found",
+                 [b"Content-Type: text/html; charset=us-ascii",
+                  b"Server: Microsoft-HTTPAPI/2.0"]),               # WinRM
+    6379:  _REDIS,                                                  # Redis
+    8080:  _http(b"200 OK", [b"Server: nginx/1.24.0 (Ubuntu)",
+                             b"Content-Type: text/html"],
+                 b"<html><body><h1>It works!</h1></body></html>\n"),  # HTTP-alt
+    8443:  b"",                                                     # HTTPS-alt (TLS)
+    9000:  _http(b"200 OK", [b"Server: gunicorn/20.1.0",
+                             b"Content-Type: text/html"],
+                 b"<html><title>Portainer</title></html>\n"),      # HTTP misc
+    9092:  b"",                                                     # Kafka (nhị phân)
+    9200:  _ES,                                                    # Elasticsearch
+    11211: _MEMCACHED,                                             # Memcached
+    15672: _http(b"200 OK",
+                 [b"Server: MochiWeb/1.5.1 (Any of you quaids got a smint?)",
+                  b"Date: Mon, 12 Jul 2026 00:00:00 GMT",
+                  b"Content-Type: text/html"],
+                 b"<!DOCTYPE html><html><head><title>RabbitMQ Management</title>"
+                 b"</head><body></body></html>\n", version=b"1.0"),  # RabbitMQ
+    27017: b"",                                                     # MongoDB (nhị phân)
 }
 
 stop = threading.Event()
 
 
 def handle_client(conn, banner):
-    """Gửi banner rồi đọc/đáp cầm chừng để nmap -sV có gì mà đọc."""
+    """Gửi banner ĐÚNG MỘT LẦN khi kết nối cho nmap -sV đọc.
+    Gửi một lần (không gửi lặp) để response không nhân đôi làm nmap khớp sai."""
     try:
         if banner:
             conn.sendall(banner)
         conn.settimeout(2)
         try:
-            data = conn.recv(1024)
-            if data and banner:
-                conn.sendall(banner)
+            conn.recv(1024)  # đọc probe của nmap để nó không reset sớm
         except socket.timeout:
             pass
     except OSError:
