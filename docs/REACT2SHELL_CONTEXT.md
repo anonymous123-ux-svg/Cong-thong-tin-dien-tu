@@ -1,6 +1,6 @@
-# React2Shell (CVE-2025-55182) Lab — Architecture Context
-**Updated:** June 30, 2026
-**Project:** dichvucong-portal (Cyber Range Lab — Cổng Dịch vụ công)
+# React2Shell (CVE-2025-55182) Lab — Bối cảnh kiến trúc
+**Cập nhật:** 30/06/2026
+**Dự án:** dichvucong-portal (Cyber Range Lab — Cổng Dịch vụ công)
 
 ## 1. Trạng thái & Kiến trúc
 Ứng dụng mô phỏng **Cổng Dịch vụ công** (tham khảo trang Tra cứu hồ sơ của Cổng Dịch vụ công Quốc gia), được vũ khí hóa làm mục tiêu Red Team.

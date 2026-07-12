@@ -19,7 +19,7 @@ info() {
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
-    printf '[setup] Missing required command: %s\n' "$1" >&2
+    printf '[setup] Thiếu lệnh bắt buộc: %s\n' "$1" >&2
     exit 1
   fi
 }
@@ -55,11 +55,11 @@ require_command npm
 require_command npx
 
 if [ ! -f .env ]; then
-  info "Creating .env from .env.example"
+  info "Đang tạo .env từ .env.example"
   cp .env.example .env
 fi
 
-info "Writing local Docker PostgreSQL configuration to .env"
+info "Đang ghi cấu hình PostgreSQL Docker cục bộ vào .env"
 set_env "DATABASE_URL" "\"${DATABASE_URL}\""
 set_env "AUTH_SECRET" "\"${AUTH_SECRET}\""
 set_env "APP_HOST" "${APP_HOST}"
@@ -68,27 +68,27 @@ set_env "DB_INTERNAL_HOST" "172.20.0.5"
 set_env "DB_USER" "readonly_auditor"
 set_env "DB_PASS" "Learning@2026!"
 
-# React 19-rc xung dot peer voi @welldone-software/why-did-you-render (peer react@^19),
-# nen bat buoc dung --legacy-peer-deps. Prisma da ghim ^6.19.3 (ho tro Node >=18.18).
+# React 19-rc xung đột peer với @welldone-software/why-did-you-render (peer react@^19),
+# nên bắt buộc dùng --legacy-peer-deps. Prisma đã ghim ^6.19.3 (hỗ trợ Node >=18.18).
 if [ ! -d node_modules ]; then
-  info "Installing npm dependencies (React RC -> --legacy-peer-deps)"
+  info "Đang cài đặt npm dependencies (React RC -> --legacy-peer-deps)"
   npm install --legacy-peer-deps
 fi
 
-info "Generating Prisma Client"
+info "Đang tạo Prisma Client"
 npx prisma generate
 
-info "Starting PostgreSQL with Docker Compose"
+info "Đang khởi động PostgreSQL bằng Docker Compose"
 docker compose up -d db
 
-info "Waiting for PostgreSQL to accept connections"
+info "Đang chờ PostgreSQL chấp nhận kết nối"
 for attempt in $(seq 1 30); do
   if docker compose exec -T db pg_isready -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
     break
   fi
 
   if [ "$attempt" -eq 30 ]; then
-    printf '[setup] PostgreSQL did not become ready in time.\n' >&2
+    printf '[setup] PostgreSQL không sẵn sàng kịp thời.\n' >&2
     docker compose ps
     exit 1
   fi
@@ -96,11 +96,11 @@ for attempt in $(seq 1 30); do
   sleep 2
 done
 
-info "Pushing Prisma schema"
+info "Đang đẩy Prisma schema"
 npx prisma db push
 
-info "Seeding lab data"
+info "Đang seed dữ liệu lab"
 npm run db:seed
 
-info "Done. Start the app with: npm run dev"
-info "Open: http://${APP_HOST}:3000"
+info "Hoàn tất. Khởi động app bằng: npm run dev"
+info "Mở: http://${APP_HOST}:3000"

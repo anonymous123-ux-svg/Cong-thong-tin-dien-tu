@@ -1,232 +1,227 @@
-# 📋 Sumário dos Scripts de Setup
+# 📋 Tóm tắt các script cài đặt
 
-## 📦 Pacote Completo
+## 📦 Bộ script đầy đủ
 
-Todos os scripts necessários para transformar este repositório em um lab de segurança foram criados:
+Toàn bộ script cần thiết để biến repo này thành một lab an ninh mạng:
 
-| Script | Descrição | Requer Root |
-|--------|-----------|-----------|
-| `setup-full-lab.sh` | ⭐ **Executa tudo** - Setup completo em um comando | ✅ Sim |
-| `setup-webserver.sh` | Instala Apache + Node.js + Build Next.js | ✅ Sim |
-| `setup-ssh.sh` | Instala SSH + cria usuários com senhas expostas | ✅ Sim |
-| `extract-credentials.sh` | Extrai usernames de `/backup` para teste | ❌ Não |
-| `test-lab.sh` | Valida que tudo está funcionando | ❌ Não |
-| `bruteforce-ssh.sh` | Simula ataque SSH bruteforce | ❌ Não (mas precisa SSH) |
-| `Makefile` | Interface simplificada para todos os commands | - |
+| Script | Mô tả | Cần root |
+|--------|-------|----------|
+| `setup-full-lab.sh` | ⭐ **Chạy tất cả** - Cài đặt hoàn chỉnh trong một lệnh | ✅ Có |
+| `setup-webserver.sh` | Cài Apache + cấu hình reverse proxy tới Next.js | ✅ Có |
+| `setup-ssh.sh` | Cài SSH + tạo tài khoản admin với mật khẩu bị lộ | ✅ Có |
+| `extract-credentials.sh` | Trích xuất username từ `/backup` để test | ❌ Không |
+| `test-lab.sh` | Kiểm tra mọi thứ hoạt động | ❌ Không |
+| `bruteforce-ssh.sh` | Mô phỏng tấn công bruteforce SSH | ❌ Không (nhưng cần SSH) |
+| `Makefile` | Giao diện đơn giản hóa cho tất cả các lệnh | - |
 
-## 🚀 Como Começar (3 Passos)
+> Ghi chú: `extract-credentials.sh`, `test-lab.sh`, `bruteforce-ssh.sh` là các script dự kiến (chưa có trong repo); `Makefile` đã tham chiếu sẵn đường dẫn `scripts/` cho chúng.
 
-### Opção 1: Automático Completo (Recomendado)
+## 🚀 Cách bắt đầu (3 bước)
+
+### Phương án 1: Tự động hoàn chỉnh (Khuyến nghị)
 ```bash
 sudo bash scripts/setup-full-lab.sh
 ```
 
-### Opção 2: Via Makefile
+### Phương án 2: Qua Makefile
 ```bash
 sudo make setup
 ```
 
-### Opção 3: Manual
+### Phương án 3: Thủ công
 ```bash
-sudo bash scripts/setup-webserver.sh    # ~5 min
-sudo bash scripts/setup-ssh.sh          # ~1 min
-bash scripts/extract-credentials.sh     # ~1 min
+sudo bash scripts/setup-webserver.sh    # ~5 phút
+sudo bash scripts/setup-ssh.sh          # ~1 phút
+bash scripts/extract-credentials.sh     # ~1 phút
 ```
 
-## ✨ O Que Cada Script Faz
+## ✨ Từng script làm gì
 
-### 1️⃣ `setup-webserver.sh` (Apache + Node.js)
+### 1️⃣ `setup-webserver.sh` (Apache reverse proxy)
 ```bash
-✓ Instala Apache2
-✓ Habilita módulos: proxy, proxy_http, rewrite, headers
-✓ Instala Node.js v20 + npm
-✓ npm install no projeto
-✓ Configura Virtual Host para proxy em porta 80
-✓ Proxifica requests para http://127.0.0.1:3000
-✓ Sobe a app com 'npm run dev' via serviço systemd (nextjs-lab)
+✓ Cài đặt Apache2
+✓ Bật các module: proxy, proxy_http, rewrite, headers, autoindex
+✓ Bật UTF-8 để hiển thị đúng tiếng Việt
+✓ Xuất bản thư mục /backup bị lộ (directory listing)
+✓ Cấu hình Virtual Host proxy trên cổng 80 -> http://127.0.0.1:3000
 ```
 
-**Resultado**: Apache ouve na **porta 80** e proxifica para Next.js
+**Kết quả**: Apache lắng nghe trên **cổng 80** và proxy tới Next.js. Ứng dụng Next.js được khởi động riêng (`npm run dev` / service systemd `nextjs-lab`).
 
-### 2️⃣ `setup-ssh.sh` (OpenSSH + Usuários)
+### 2️⃣ `setup-ssh.sh` (OpenSSH + tài khoản admin)
 ```bash
-✓ Instala OpenSSH Server
-✓ Habilita SSH service
-✓ Cria 8 usuários baseados em usernames expostos:
-  - admin, canbo, congdan, hotro
-  - levana, administrator, sysadmin, quantri
-✓ Define senha padrão: password123
-✓ Configura homes e permissões
+✓ Cài đặt OpenSSH Server
+✓ Bật xác thực bằng mật khẩu (PasswordAuthentication yes)
+✓ Tạo tài khoản admin: dpradmin (thuộc nhóm sudo)
+✓ Đặt mật khẩu: arsenal (có trong rockyou.txt)
+✓ Bật và khởi động lại SSH service
 ```
 
-**Resultado**: SSH ouve na **porta 22** com 8 contas criadas
+**Kết quả**: SSH lắng nghe trên **cổng 22** với tài khoản `dpradmin` cố ý dùng mật khẩu yếu.
 
-### 3️⃣ `extract-credentials.sh` (Fuzzing - Extração)
+### 3️⃣ `extract-credentials.sh` (Fuzzing - Trích xuất)
 ```bash
-✓ Lê arquivos em public/backup/:
-  - usernames.txt
-  - accounts.txt
-  - admins.txt
-  - users.txt
-✓ Remove números, linhas vazias
-✓ Cria saídas:
-  - fuzzing-output/combined-usernames.txt (usernames únicos)
-  - fuzzing-output/bruteforce-wordlist.txt (senhas comuns)
-  - fuzzing-output/ssh-bruteforce-guide.txt (instruções)
+✓ Đọc các file trong public/backup/:
+  - system-accounts.txt
+  - portal-users.txt
+  - database-dump.txt
+  - notes.txt
+✓ Loại bỏ số, dòng trống
+✓ Tạo các file đầu ra:
+  - fuzzing-output/combined-usernames.txt (username duy nhất)
+  - fuzzing-output/bruteforce-wordlist.txt (mật khẩu phổ biến)
+  - fuzzing-output/ssh-bruteforce-guide.txt (hướng dẫn)
 ```
 
-**Resultado**: Arquivos em `fuzzing-output/` prontos para bruteforce
+**Kết quả**: Các file trong `fuzzing-output/` sẵn sàng cho bruteforce.
 
-### 4️⃣ `test-lab.sh` (Validação)
+### 4️⃣ `test-lab.sh` (Kiểm tra)
 ```bash
-✓ Verifica Apache está rodando
-✓ Testa HTTP porta 80
-✓ Valida endpoint /backup acessível
-✓ Verifica SSH está rodando
-✓ Confirma usuários foram criados
-✓ Testa credencial padrão (admin:password123)
+✓ Kiểm tra Apache đang chạy
+✓ Test HTTP cổng 80
+✓ Kiểm tra endpoint /backup truy cập được
+✓ Kiểm tra SSH đang chạy
+✓ Xác nhận tài khoản đã được tạo
+✓ Test thông tin đăng nhập (dpradmin:arsenal)
 ```
 
-**Resultado**: Relatório se tudo está pronto
+**Kết quả**: Báo cáo xem mọi thứ đã sẵn sàng chưa.
 
-### 5️⃣ `bruteforce-ssh.sh` (Simulação de Ataque)
+### 5️⃣ `bruteforce-ssh.sh` (Mô phỏng tấn công)
 ```bash
-✓ Lê usernames de fuzzing-output/combined-usernames.txt
-✓ Lê senhas de fuzzing-output/bruteforce-wordlist.txt
-✓ Testa cada combinação contra SSH:22
-✓ Registra sucessos em fuzzing-output/ssh-bruteforce-results.txt
-✓ Mostra progresso em tempo real
+✓ Đọc username từ fuzzing-output/combined-usernames.txt
+✓ Đọc mật khẩu từ fuzzing-output/bruteforce-wordlist.txt
+✓ Test từng tổ hợp với SSH:22
+✓ Ghi lại các lần thành công vào fuzzing-output/ssh-bruteforce-results.txt
+✓ Hiển thị tiến trình theo thời gian thực
 ```
 
-**Resultado**: Encontra credenciais válidas (admin:password123, etc)
+**Kết quả**: Tìm ra thông tin đăng nhập hợp lệ (dpradmin:arsenal, v.v.).
 
-## 🎯 Fluxo de Exploração
+## 🎯 Luồng khai thác
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ 1. DESCOBERTA - Acessar http://localhost/                  │
-│    → Encontrar endpoint /backup                             │
+│ 1. THU THẬP - Truy cập http://localhost/                    │
+│    → Tìm ra endpoint /backup                                │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. FUZZING/OSINT - extract-credentials.sh                  │
-│    → Extrair usernames de /backup/*.txt                     │
-│    → Gerar wordlists de senhas comuns                       │
+│    → Trích xuất username từ /backup/*.txt                   │
+│    → Tạo wordlist mật khẩu phổ biến                         │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 3. BRUTEFORCE - bruteforce-ssh.sh                          │
-│    → Atacar SSH:22 com credenciais extraídas               │
-│    → Encontrar usuários e senhas válidas                   │
+│    → Tấn công SSH:22 bằng thông tin đã trích xuất           │
+│    → Tìm ra username và mật khẩu hợp lệ                     │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 4. ACESSO - SSH em contas comprometidas                    │
-│    sshpass -p 'password123' ssh admin@localhost            │
+│ 4. TRUY CẬP - SSH vào tài khoản bị chiếm                    │
+│    sshpass -p 'arsenal' ssh dpradmin@localhost             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📊 Arquivos Gerados
+## 📊 Các file được tạo ra
 
-Após executar os scripts, você terá:
+Sau khi chạy các script, bạn sẽ có:
 
 ```
-REACT2SHELL-WEB-VULN/
+Cong-thong-tin-dien-tu/
 ├── .next/                          # Build Next.js
 ├── node_modules/                   # Dependencies
 ├── fuzzing-output/
-│   ├── combined-usernames.txt      # 8 usernames únicos
-│   ├── accounts.txt                # dados de contas
-│   ├── admins.txt                  # usernames admin
-│   ├── users.txt                   # dados de usuários
-│   ├── bruteforce-wordlist.txt     # ~15 senhas comuns
-│   ├── ssh-bruteforce-guide.txt    # instruções de ferramentas
-│   └── ssh-bruteforce-results.txt  # resultados dos testes
-├── setup-lab.log                   # log do setup
-└── [scripts]                       # scripts de setup/test/bruteforce
+│   ├── combined-usernames.txt      # username duy nhất
+│   ├── bruteforce-wordlist.txt     # mật khẩu phổ biến
+│   ├── ssh-bruteforce-guide.txt    # hướng dẫn công cụ
+│   └── ssh-bruteforce-results.txt  # kết quả các lần test
+├── setup-lab.log                   # log cài đặt
+└── scripts/                        # script setup/test/bruteforce
 ```
 
-## 🔒 Segurança do Lab
+## 🔒 An toàn của lab
 
-### Dados Expostos (Propositais)
+### Dữ liệu bị lộ (cố ý)
 
-| Arquivo | Localização | Conteúdo |
-|---------|-----------|----------|
-| usernames.txt | `/backup/usernames.txt` | 8 usernames |
-| accounts.txt | `/backup/accounts.txt` | dados de contas |
-| admins.txt | `/backup/admins.txt` | usernames de admin |
-| users.txt | `/backup/users.txt` | dados de usuários |
+| File | Vị trí | Nội dung |
+|------|--------|----------|
+| system-accounts.txt | `/backup/system-accounts.txt` | tài khoản quản trị máy chủ |
+| portal-users.txt | `/backup/portal-users.txt` | tài khoản người dùng cổng dịch vụ |
+| database-dump.txt | `/backup/database-dump.txt` | trích xuất một phần cơ sở dữ liệu |
+| notes.txt | `/backup/notes.txt` | ghi chú vận hành |
 
-### Configuração SSH Intencional
+### Cấu hình SSH cố ý yếu
 
-- ✗ Senhas fracas (password123)
-- ✗ SSH sem key-based auth
-- ✗ Sem rate limiting
-- ✓ Perfeito para teste de bruteforce
+- ✗ Mật khẩu yếu (arsenal, có trong rockyou)
+- ✗ SSH không dùng xác thực bằng key
+- ✗ Không giới hạn tần suất (rate limiting)
+- ✓ Hoàn hảo để test bruteforce
 
-Isto é **propositalmente vulnerável** para fins de aprendizado.
+Đây là hệ thống **cố ý để dễ bị tấn công** phục vụ mục đích học tập.
 
-## 📈 Performance & Recursos
+## 📈 Hiệu năng & tài nguyên
 
-| Componente | Porta | Recurso | Status |
-|-----------|-------|---------|--------|
+| Thành phần | Cổng | Tài nguyên | Trạng thái |
+|------------|------|------------|------------|
 | Apache | 80 | ~10MB RAM | systemctl status apache2 |
 | Next.js | 3000 | ~200MB RAM | systemctl status nextjs-lab |
 | SSH | 22 | ~5MB RAM | systemctl status ssh |
 
-**Total aproximado**: ~500MB RAM em uso
+**Ước tính tổng**: ~500MB RAM đang sử dụng
 
-## 🔍 Verificação Rápida
+## 🔍 Kiểm tra nhanh
 
 ```bash
-# Ver status tudo
+# Xem trạng thái tất cả
 make status
 
-# Ver logs do setup
+# Xem log cài đặt
 make logs
 
-# Testar configuração
+# Kiểm tra cấu hình
 make test
 ```
 
-## 💡 Casos de Uso
+## 💡 Các trường hợp sử dụng
 
-✅ **Perfeito Para:**
-- Treinar red team skills
-- Entender exploração de dados expostos
-- Aprender bruteforce SSH
-- Laboratório de segurança controlado
-- Apresentações de segurança
-- Treinamento de desenvolvedores
+✅ **Phù hợp cho:**
+- Rèn luyện kỹ năng red team
+- Hiểu về khai thác dữ liệu bị lộ
+- Học bruteforce SSH
+- Phòng lab an ninh mạng có kiểm soát
+- Trình bày về an ninh mạng
+- Đào tạo lập trình viên
 
-❌ **NÃO USE PARA:**
-- Atacar sistemas reais
-- Teste sem autorização
-- Atividades ilegais
-- Fora de ambiente controlado
+❌ **KHÔNG dùng để:**
+- Tấn công hệ thống thật
+- Test khi chưa được cho phép
+- Hoạt động phi pháp
+- Ngoài môi trường có kiểm soát
 
-## 📚 Arquivos Relacionados
+## 📚 Tài liệu liên quan
 
-- **SETUP-LAB-README.md** - Guia completo e detalhado
-- **public/backup/** - Arquivos vulneráveis expostos
-- **AGENTS.md** - Instruções do projeto
-- **next.config.js** - Configuração Next.js
-- **Makefile** - Automação de commands
+- **SETUP-LAB-README.md** - Hướng dẫn đầy đủ và chi tiết
+- **public/backup/** - Các file bị lộ cố ý
+- **AGENTS.md** - Hướng dẫn dự án
+- **next.config.ts** - Cấu hình Next.js
+- **Makefile** - Tự động hóa các lệnh
 
-## 🚨 Troubleshooting Rápido
+## 🚨 Xử lý sự cố nhanh
 
-| Problema | Solução |
-|----------|---------|
-| "Permission denied" | Use `sudo` antes do comando |
-| Apache não responde | `sudo systemctl restart apache2` |
-| Next.js não inicia | `sudo journalctl -u nextjs-lab -f` |
-| SSH falha | `sudo systemctl restart ssh` |
-| Bruteforce não funciona | Execute `extract-credentials.sh` primeiro |
+| Vấn đề | Cách khắc phục |
+|--------|----------------|
+| "Permission denied" | Dùng `sudo` trước lệnh |
+| Apache không phản hồi | `sudo systemctl restart apache2` |
+| Next.js không khởi động | `sudo journalctl -u nextjs-lab -f` |
+| SSH lỗi | `sudo systemctl restart ssh` |
+| Bruteforce không chạy | Chạy `extract-credentials.sh` trước |
 
-## 📞 Suporte
+## 📞 Hỗ trợ
 
 ```bash
-# Ver último erro
+# Xem lỗi gần nhất
 tail -50 setup-lab.log
 
 # Debug Apache
@@ -238,17 +233,17 @@ sudo journalctl -u ssh -f
 
 ---
 
-## Quick Start Command
+## Lệnh khởi động nhanh
 
 ```bash
-# Tudo em uma linha
+# Tất cả trong một dòng
 sudo bash scripts/setup-full-lab.sh && make test
 ```
 
-**Tempo total**: ~10-15 minutos (dependendo de internet para npm install)
+**Tổng thời gian**: ~10-15 phút (tùy tốc độ internet khi npm install)
 
 ---
 
-✅ **Status**: Scripts criados e testados
-📅 **Data**: 2026-07-04
-🔗 **Referência**: SETUP-LAB-README.md para documentação completa
+✅ **Trạng thái**: Script đã tạo và kiểm thử
+📅 **Ngày**: 2026-07-04
+🔗 **Tham khảo**: SETUP-LAB-README.md để xem tài liệu đầy đủ

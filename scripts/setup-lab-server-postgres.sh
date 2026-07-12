@@ -17,7 +17,7 @@ info() {
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
-    printf '[setup] Missing required command: %s\n' "$1" >&2
+    printf '[setup] Thiếu lệnh bắt buộc: %s\n' "$1" >&2
     exit 1
   fi
 }
@@ -61,24 +61,24 @@ require_command npm
 require_command npx
 
 if [ ! -f .env ]; then
-  info "Creating .env from .env.example"
+  info "Đang tạo .env từ .env.example"
   cp .env.example .env
 fi
 
-read -r -p "Nhap IP/hostname cua database server PostgreSQL: " DB_HOST
+read -r -p "Nhập IP/hostname của database server PostgreSQL: " DB_HOST
 if [ -z "$DB_HOST" ]; then
-  printf '[setup] Database server IP/hostname is required.\n' >&2
+  printf '[setup] Bắt buộc phải nhập IP/hostname của database server.\n' >&2
   exit 1
 fi
 
-DB_PORT="$(prompt_default "PostgreSQL port" "$DEFAULT_DB_PORT")"
-DB_NAME="$(prompt_default "Database name" "$DEFAULT_DB_NAME")"
-DB_USER_NAME="$(prompt_default "Database user" "$DEFAULT_DB_USER")"
-DB_PASSWORD_VALUE="$(prompt_default "Database password" "$DEFAULT_DB_PASSWORD")"
-APP_HOST_VALUE="$(prompt_default "APP_HOST cua may chay lab" "$DEFAULT_APP_HOST")"
+DB_PORT="$(prompt_default "Cổng PostgreSQL" "$DEFAULT_DB_PORT")"
+DB_NAME="$(prompt_default "Tên database" "$DEFAULT_DB_NAME")"
+DB_USER_NAME="$(prompt_default "User database" "$DEFAULT_DB_USER")"
+DB_PASSWORD_VALUE="$(prompt_default "Mật khẩu database" "$DEFAULT_DB_PASSWORD")"
+APP_HOST_VALUE="$(prompt_default "APP_HOST của máy chạy lab" "$DEFAULT_APP_HOST")"
 DATABASE_URL="postgresql://${DB_USER_NAME}:${DB_PASSWORD_VALUE}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
-info "Writing PostgreSQL server configuration to .env"
+info "Đang ghi cấu hình PostgreSQL server vào .env"
 set_env "DATABASE_URL" "\"${DATABASE_URL}\""
 set_env "AUTH_SECRET" "\"${AUTH_SECRET}\""
 set_env "APP_HOST" "${APP_HOST_VALUE}"
@@ -87,33 +87,33 @@ set_env "DB_INTERNAL_HOST" "${DB_HOST}"
 set_env "DB_USER" "readonly_auditor"
 set_env "DB_PASS" "Learning@2026!"
 
-# React 19-rc xung dot peer voi @welldone-software/why-did-you-render (peer react@^19),
-# nen bat buoc dung --legacy-peer-deps khi khong co lockfile hop le.
-# Prisma da duoc ghim ^6.19.3 (ho tro Node >=18.18) de chay duoc tren Node cu cua lab.
+# React 19-rc xung đột peer với @welldone-software/why-did-you-render (peer react@^19),
+# nên bắt buộc dùng --legacy-peer-deps khi không có lockfile hợp lệ.
+# Prisma đã được ghim ^6.19.3 (hỗ trợ Node >=18.18) để chạy được trên Node cũ của lab.
 if [ ! -d node_modules ]; then
-  info "Installing npm dependencies (React RC -> --legacy-peer-deps)"
+  info "Đang cài đặt npm dependencies (React RC -> --legacy-peer-deps)"
   npm install --legacy-peer-deps
 fi
 
-info "Generating Prisma Client"
+info "Đang tạo Prisma Client"
 npx prisma generate
 
-info "Checking database connection through Prisma"
-# Prisma 6.x yeu cau --url (hoac --schema) cho `db execute`; khong tu lay url tu config file.
+info "Đang kiểm tra kết nối database qua Prisma"
+# Prisma 6.x yêu cầu --url (hoặc --schema) cho `db execute`; không tự lấy url từ file config.
 if ! npx prisma db execute --url "$DATABASE_URL" --stdin <<SQL
 SELECT 1;
 SQL
 then
-  printf '[setup] Cannot connect to PostgreSQL server.\n' >&2
-  printf '[setup] Check that %s:%s is reachable, database "%s" exists, and the credentials are correct.\n' "$DB_HOST" "$DB_PORT" "$DB_NAME" >&2
+  printf '[setup] Không kết nối được tới PostgreSQL server.\n' >&2
+  printf '[setup] Kiểm tra %s:%s có truy cập được không, database "%s" đã tồn tại chưa, và thông tin đăng nhập có đúng không.\n' "$DB_HOST" "$DB_PORT" "$DB_NAME" >&2
   exit 1
 fi
 
-info "Pushing Prisma schema"
+info "Đang đẩy Prisma schema"
 npx prisma db push
 
-info "Seeding lab data"
+info "Đang seed dữ liệu lab"
 npm run db:seed
 
-info "Done. Start the app with: npm run dev"
-info "Open: http://${APP_HOST_VALUE}:3000"
+info "Hoàn tất. Khởi động app bằng: npm run dev"
+info "Mở: http://${APP_HOST_VALUE}:3000"

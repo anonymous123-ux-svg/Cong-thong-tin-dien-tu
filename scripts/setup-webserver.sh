@@ -1,34 +1,34 @@
 #!/bin/bash
-# Setup apenas do Apache (proxy reverso para o Next.js)
-# Este script configura SOMENTE o servidor web Apache.
-# A aplicação Next.js deve ser iniciada manualmente com `npm run dev`
-# (o Apache faz proxy da porta 80 para a porta 3000).
+# Chỉ cài đặt Apache (reverse proxy tới Next.js)
+# Script này CHỈ cấu hình web server Apache.
+# Ứng dụng Next.js phải được khởi động thủ công bằng `npm run dev`
+# (Apache làm proxy từ cổng 80 sang cổng 3000).
 
 set -e
 
-# Diretório do projeto = raiz do repositório (este script vive em scripts/)
+# Thư mục dự án = thư mục gốc của repo (script này nằm trong scripts/)
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-echo "[*] Iniciando setup do Apache..."
-echo "[*] Diretório do projeto: ${PROJECT_DIR}"
+echo "[*] Bắt đầu cài đặt Apache..."
+echo "[*] Thư mục dự án: ${PROJECT_DIR}"
 
-# Atualizar sistema
-echo "[*] Atualizando repositórios do sistema..."
+# Cập nhật hệ thống
+echo "[*] Đang cập nhật repository của hệ thống..."
 apt-get update -y
 
-# Instalar Apache2
-echo "[*] Instalando Apache2..."
+# Cài đặt Apache2
+echo "[*] Đang cài đặt Apache2..."
 apt-get install -y apache2
 
-# Habilitar módulos necessários
+# Bật các module cần thiết
 a2enmod proxy
 a2enmod proxy_http
 a2enmod rewrite
 a2enmod headers
-a2enmod autoindex   # necessário para a listagem de diretório em /backup
+a2enmod autoindex   # cần cho việc liệt kê thư mục tại /backup
 
-# Publicar os arquivos de "backup" expostos (vulnerabilidade simulada)
-echo "[*] Publicando diretório /backup exposto..."
+# Xuất bản các file "backup" bị lộ (lỗ hổng mô phỏng)
+echo "[*] Đang xuất bản thư mục /backup bị lộ..."
 BACKUP_SRC="$PROJECT_DIR/public/backup"
 BACKUP_WEB="/var/www/backup"
 mkdir -p "$BACKUP_WEB"
@@ -36,20 +36,20 @@ cp -f "$BACKUP_SRC"/*.txt "$BACKUP_WEB"/ 2>/dev/null || true
 chown -R www-data:www-data "$BACKUP_WEB"
 chmod -R 755 "$BACKUP_WEB"
 
-# Criar arquivo de configuração do Apache para o Next.js
-echo "[*] Configurando Virtual Host do Apache..."
+# Tạo file cấu hình Apache cho Next.js
+echo "[*] Đang cấu hình Virtual Host của Apache..."
 cat > /etc/apache2/sites-available/nextjs-app.conf << 'EOF'
 <VirtualHost *:80>
     ServerName localhost
     ServerAdmin admin@localhost
 
-    # --- UTF-8: exibe corretamente conteúdo em português/vietnamita ---
-    # Envia "; charset=UTF-8" para a listagem /backup e para os arquivos .txt.
+    # --- UTF-8: hiển thị đúng nội dung tiếng Việt ---
+    # Gửi "; charset=UTF-8" cho trang liệt kê /backup và các file .txt.
     AddDefaultCharset UTF-8
     AddCharset UTF-8 .txt
 
-    # --- Diretório /backup EXPOSTO (vulnerabilidade: directory listing) ---
-    # Servido diretamente pelo Apache (fora do proxy) com listagem habilitada.
+    # --- Thư mục /backup BỊ LỘ (lỗ hổng: directory listing) ---
+    # Do Apache phục vụ trực tiếp (ngoài proxy) với listing được bật.
     Alias /backup /var/www/backup
     <Directory /var/www/backup>
         Options +Indexes +FollowSymLinks
@@ -57,42 +57,42 @@ cat > /etc/apache2/sites-available/nextjs-app.conf << 'EOF'
         Require all granted
         IndexOptions FancyIndexing HTMLTable NameWidth=* SuppressColumnSorting
     </Directory>
-    # Excluir /backup do proxy para o Next.js (precisa vir ANTES do ProxyPass /)
+    # Loại /backup khỏi proxy tới Next.js (phải đặt TRƯỚC ProxyPass /)
     ProxyPass /backup !
 
-    # Proxy para a aplicação Next.js (iniciada manualmente com `npm run dev`)
+    # Proxy tới ứng dụng Next.js (khởi động thủ công bằng `npm run dev`)
     ProxyPreserveHost On
     ProxyPass / http://127.0.0.1:3000/
     ProxyPassReverse / http://127.0.0.1:3000/
 
-    # Headers necessários
+    # Các header cần thiết
     RequestHeader set X-Forwarded-Proto "http"
     RequestHeader set X-Forwarded-For "%{REMOTE_ADDR}s"
 
-    # Logs
+    # Log
     ErrorLog ${APACHE_LOG_DIR}/nextjs-app-error.log
     CustomLog ${APACHE_LOG_DIR}/nextjs-app-access.log combined
 </VirtualHost>
 EOF
 
-# Desabilitar site padrão
+# Tắt site mặc định
 a2dissite 000-default
 
-# Habilitar novo site
+# Bật site mới
 a2ensite nextjs-app
 
-# Testar configuração do Apache
-echo "[*] Testando configuração do Apache..."
+# Kiểm tra cấu hình Apache
+echo "[*] Đang kiểm tra cấu hình Apache..."
 apache2ctl configtest
 
-# Reiniciar Apache
-echo "[*] Reiniciando Apache..."
+# Khởi động lại Apache
+echo "[*] Đang khởi động lại Apache..."
 systemctl restart apache2
 
-echo "[+] Apache configurado com sucesso na porta 80!"
+echo "[+] Apache đã được cấu hình thành công trên cổng 80!"
 echo ""
-echo "Próximo passo: inicie a aplicação manualmente no diretório do projeto:"
+echo "Bước tiếp theo: khởi động ứng dụng thủ công trong thư mục dự án:"
 echo "  cd ${PROJECT_DIR}"
 echo "  npm run dev"
 echo ""
-echo "O Apache fará o proxy da porta 80 para a aplicação na porta 3000."
+echo "Apache sẽ proxy từ cổng 80 sang ứng dụng ở cổng 3000."

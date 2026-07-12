@@ -1,40 +1,40 @@
 #!/bin/bash
 # =============================================================================
-#  Setup completo do lab React2Shell-Web-Vulnerable
-#  - Apache webserver (proxy Next.js + diretório /backup exposto)
-#  - OpenSSH server + usuário admin do repo (senha vinda do rockyou)
+#  Cài đặt hoàn chỉnh lab React2Shell-Web-Vulnerable
+#  - Web server Apache (proxy tới Next.js + thư mục /backup bị lộ)
+#  - OpenSSH server + tài khoản admin của repo (mật khẩu nằm trong rockyou)
 # -----------------------------------------------------------------------------
-#  Uso APENAS educacional / CTF / red team em ambiente autorizado.
+#  CHỈ dùng cho mục đích giáo dục / CTF / red team trong môi trường được phép.
 # =============================================================================
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [ "$(id -u)" != "0" ]; then
-    echo "[!] Este script precisa de root. Execute: sudo bash setup-full-lab.sh"
+    echo "[!] Script này cần quyền root. Chạy: sudo bash setup-full-lab.sh"
     exit 1
 fi
 
 echo "========================================================"
-echo "  [1/2] Configurando o webserver (Apache + Next.js + /backup)"
+echo "  [1/2] Cấu hình web server (Apache + Next.js + /backup)"
 echo "========================================================"
 bash "$SCRIPT_DIR/setup-webserver.sh"
 
 echo ""
 echo "========================================================"
-echo "  [2/2] Configurando o SSH (OpenSSH + usuário admin)"
+echo "  [2/2] Cấu hình SSH (OpenSSH + tài khoản admin)"
 echo "========================================================"
 bash "$SCRIPT_DIR/setup-ssh.sh"
 
 echo ""
 echo "========================================================"
-echo "  [+] Lab configurado com sucesso!"
+echo "  [+] Lab đã được cấu hình thành công!"
 echo "========================================================"
 echo ""
-echo "  A aplicação Next.js já está rodando (serviço systemd 'nextjs-lab')"
+echo "  Ứng dụng Next.js đang chạy (service systemd 'nextjs-lab')"
 echo "      sudo systemctl status nextjs-lab"
 echo ""
-echo "  Superfície exposta:"
+echo "  Bề mặt tấn công bị lộ:"
 echo "      Web  : http://localhost/            (portal)"
 echo "      Leak : http://localhost/backup/     (directory listing)"
-echo "      SSH  : ssh dpradmin@localhost       (senha no rockyou)"
+echo "      SSH  : ssh dpradmin@localhost       (mật khẩu trong rockyou)"

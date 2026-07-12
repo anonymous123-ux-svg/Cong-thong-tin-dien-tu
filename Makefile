@@ -1,6 +1,6 @@
 .PHONY: help setup setup-web setup-ssh extract test bruteforce clean start stop status logs
 
-# Cores para output
+# Màu cho output
 GREEN=\033[0;32m
 BLUE=\033[0;34m
 YELLOW=\033[1;33m
@@ -9,92 +9,92 @@ NC=\033[0m
 help:
 	@echo "$(BLUE)Security Lab - React2Shell Web Vulnerable$(NC)"
 	@echo ""
-	@echo "$(GREEN)Targets disponíveis:$(NC)"
-	@echo "  $(YELLOW)setup$(NC)              - Setup completo do lab (webserver + SSH + credenciais)"
-	@echo "  $(YELLOW)setup-web$(NC)          - Setup apenas do webserver (Apache + Node.js)"
-	@echo "  $(YELLOW)setup-ssh$(NC)          - Setup apenas do SSH (OpenSSH + usuários)"
-	@echo "  $(YELLOW)extract$(NC)            - Extrair credenciais expostas do /backup"
-	@echo "  $(YELLOW)test$(NC)               - Testar configuração do lab"
-	@echo "  $(YELLOW)bruteforce$(NC)         - Executar bruteforce SSH"
-	@echo "  $(YELLOW)start$(NC)              - Iniciar aplicação (serviço nextjs-lab)"
-	@echo "  $(YELLOW)stop$(NC)               - Parar aplicação"
-	@echo "  $(YELLOW)status$(NC)             - Ver status dos serviços"
-	@echo "  $(YELLOW)logs$(NC)               - Ver logs do setup"
-	@echo "  $(YELLOW)clean$(NC)              - Limpar arquivos temporários"
+	@echo "$(GREEN)Các target khả dụng:$(NC)"
+	@echo "  $(YELLOW)setup$(NC)              - Cài đặt hoàn chỉnh lab (webserver + SSH + thông tin đăng nhập)"
+	@echo "  $(YELLOW)setup-web$(NC)          - Chỉ cài đặt webserver (Apache reverse proxy)"
+	@echo "  $(YELLOW)setup-ssh$(NC)          - Chỉ cài đặt SSH (OpenSSH + tài khoản)"
+	@echo "  $(YELLOW)extract$(NC)            - Trích xuất thông tin đăng nhập bị lộ từ /backup"
+	@echo "  $(YELLOW)test$(NC)               - Kiểm tra cấu hình lab"
+	@echo "  $(YELLOW)bruteforce$(NC)         - Chạy bruteforce SSH"
+	@echo "  $(YELLOW)start$(NC)              - Khởi động ứng dụng (service nextjs-lab)"
+	@echo "  $(YELLOW)stop$(NC)               - Dừng ứng dụng"
+	@echo "  $(YELLOW)status$(NC)             - Xem trạng thái các service"
+	@echo "  $(YELLOW)logs$(NC)               - Xem log cài đặt"
+	@echo "  $(YELLOW)clean$(NC)              - Dọn dẹp file tạm"
 	@echo ""
-	@echo "$(BLUE)Exemplos:$(NC)"
-	@echo "  make setup                    # Setup completo com todas as etapas"
-	@echo "  make setup && make start      # Setup + iniciar aplicação"
-	@echo "  make test                     # Verificar se tudo está funcionando"
+	@echo "$(BLUE)Ví dụ:$(NC)"
+	@echo "  make setup                    # Cài đặt hoàn chỉnh tất cả các bước"
+	@echo "  make setup && make start      # Cài đặt + khởi động ứng dụng"
+	@echo "  make test                     # Kiểm tra mọi thứ có hoạt động không"
 	@echo ""
 
 setup: check-root
-	@echo "$(GREEN)[*] Executando setup completo do lab...$(NC)"
+	@echo "$(GREEN)[*] Đang chạy cài đặt hoàn chỉnh lab...$(NC)"
 	@sudo bash scripts/setup-full-lab.sh
-	@echo "$(GREEN)[+] Setup concluído! Aplicação já está rodando (serviço nextjs-lab)$(NC)"
+	@echo "$(GREEN)[+] Cài đặt hoàn tất! Ứng dụng đang chạy (service nextjs-lab)$(NC)"
 	@echo ""
-	@echo "$(YELLOW)Próximos passos:$(NC)"
-	@echo "  make test           - Testar configuração"
+	@echo "$(YELLOW)Các bước tiếp theo:$(NC)"
+	@echo "  make test           - Kiểm tra cấu hình"
 	@echo ""
 
 setup-web: check-root
-	@echo "$(GREEN)[*] Instalando webserver (Apache + Node.js)...$(NC)"
+	@echo "$(GREEN)[*] Đang cài đặt webserver (Apache reverse proxy)...$(NC)"
 	@sudo bash scripts/setup-webserver.sh
 
 setup-ssh: check-root
-	@echo "$(GREEN)[*] Instalando SSH...$(NC)"
+	@echo "$(GREEN)[*] Đang cài đặt SSH...$(NC)"
 	@sudo bash scripts/setup-ssh.sh
 
 extract:
-	@echo "$(GREEN)[*] Extraindo credenciais expostas...$(NC)"
+	@echo "$(GREEN)[*] Đang trích xuất thông tin đăng nhập bị lộ...$(NC)"
 	@bash scripts/extract-credentials.sh
-	@echo "$(GREEN)[+] Credenciais extraídas com sucesso!$(NC)"
+	@echo "$(GREEN)[+] Trích xuất thông tin đăng nhập thành công!$(NC)"
 
 test:
-	@echo "$(GREEN)[*] Testando lab setup...$(NC)"
+	@echo "$(GREEN)[*] Đang kiểm tra cài đặt lab...$(NC)"
 	@bash scripts/test-lab.sh
 
 bruteforce:
-	@echo "$(GREEN)[*] Iniciando bruteforce SSH...$(NC)"
+	@echo "$(GREEN)[*] Đang bắt đầu bruteforce SSH...$(NC)"
 	@bash scripts/bruteforce-ssh.sh localhost 22
 
 start:
-	@echo "$(GREEN)[*] Iniciando aplicação Next.js (nextjs-lab)...$(NC)"
+	@echo "$(GREEN)[*] Đang khởi động ứng dụng Next.js (nextjs-lab)...$(NC)"
 	@sudo systemctl start nextjs-lab
 
 stop:
-	@echo "$(YELLOW)[*] Parando serviços...$(NC)"
+	@echo "$(YELLOW)[*] Đang dừng các service...$(NC)"
 	@sudo systemctl stop nextjs-lab || true
-	@echo "$(GREEN)[+] Serviços parados.$(NC)"
+	@echo "$(GREEN)[+] Đã dừng các service.$(NC)"
 
 status:
-	@echo "$(BLUE)Status dos Serviços:$(NC)"
+	@echo "$(BLUE)Trạng thái các service:$(NC)"
 	@echo ""
 	@echo "Apache2:"
-	@sudo systemctl status apache2 --no-pager | grep "Active:" || echo "  Desativado"
+	@sudo systemctl status apache2 --no-pager | grep "Active:" || echo "  Đã tắt"
 	@echo ""
 	@echo "SSH:"
-	@sudo systemctl status ssh --no-pager | grep "Active:" || echo "  Desativado"
+	@sudo systemctl status ssh --no-pager | grep "Active:" || echo "  Đã tắt"
 	@echo ""
 	@echo "Next.js (nextjs-lab):"
-	@sudo systemctl status nextjs-lab --no-pager | grep "Active:" || echo "  Desativado"
+	@sudo systemctl status nextjs-lab --no-pager | grep "Active:" || echo "  Đã tắt"
 	@echo ""
-	@echo "Apache Proxy (porta 80):"
-	@curl -s -o /dev/null -w "  HTTP Status: %{http_code}\n" http://localhost/ || echo "  ✗ Não respondendo"
+	@echo "Apache Proxy (cổng 80):"
+	@curl -s -o /dev/null -w "  HTTP Status: %{http_code}\n" http://localhost/ || echo "  ✗ Không phản hồi"
 
 logs:
-	@echo "$(BLUE)Setup Log:$(NC)"
-	@test -f setup-lab.log && tail -50 setup-lab.log || echo "Arquivo log não encontrado"
+	@echo "$(BLUE)Log cài đặt:$(NC)"
+	@test -f setup-lab.log && tail -50 setup-lab.log || echo "Không tìm thấy file log"
 
 clean:
-	@echo "$(YELLOW)[*] Limpando arquivos temporários...$(NC)"
+	@echo "$(YELLOW)[*] Đang dọn dẹp file tạm...$(NC)"
 	@rm -f setup-lab.log
 	@rm -rf .next
-	@echo "$(GREEN)[+] Limpeza concluída.$(NC)"
+	@echo "$(GREEN)[+] Dọn dẹp hoàn tất.$(NC)"
 
 check-root:
 	@if [ "$$(id -u)" != "0" ]; then \
-		echo "$(RED)[!] Este comando requer sudo. Execute:$(NC)"; \
+		echo "$(RED)[!] Lệnh này cần quyền sudo. Chạy:$(NC)"; \
 		echo "    sudo make setup"; \
 		exit 1; \
 	fi
