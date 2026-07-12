@@ -206,15 +206,17 @@ echo "[*] Tạo systemd service ${SERVICE_NAME}..."
 cat > "$UNIT" << EOF
 [Unit]
 Description=Fake services honeypot (banner cho nmap - lab)
-After=network.target
+# Khởi động SAU các dịch vụ THẬT (Apache/Next.js/SSH/PostgreSQL) để chúng bind
+# cổng của mình trước; honeypot chỉ mở những cổng còn trống (bind-skip).
+# After trên unit không tồn tại sẽ được bỏ qua an toàn.
+After=network-online.target apache2.service nextjs-lab.service ssh.service sshd.service postgresql.service
+Wants=network-online.target
 
 [Service]
 Type=simple
 ExecStart=${PYTHON} ${ENGINE}
 Restart=on-failure
 RestartSec=3
-# Đợi network sẵn sàng để bind cổng ổn định sau khi boot
-ExecStartPre=/bin/sleep 2
 
 [Install]
 WantedBy=multi-user.target
