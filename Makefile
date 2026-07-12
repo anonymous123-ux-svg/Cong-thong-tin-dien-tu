@@ -30,7 +30,7 @@ help:
 
 setup: check-root
 	@echo "$(GREEN)[*] Executando setup completo do lab...$(NC)"
-	@sudo bash setup-full-lab.sh
+	@sudo bash scripts/setup-full-lab.sh
 	@echo "$(GREEN)[+] Setup concluído! Aplicação já está rodando (serviço nextjs-lab)$(NC)"
 	@echo ""
 	@echo "$(YELLOW)Próximos passos:$(NC)"
@@ -39,24 +39,24 @@ setup: check-root
 
 setup-web: check-root
 	@echo "$(GREEN)[*] Instalando webserver (Apache + Node.js)...$(NC)"
-	@sudo bash setup-webserver.sh
+	@sudo bash scripts/setup-webserver.sh
 
 setup-ssh: check-root
 	@echo "$(GREEN)[*] Instalando SSH...$(NC)"
-	@sudo bash setup-ssh.sh
+	@sudo bash scripts/setup-ssh.sh
 
 extract:
 	@echo "$(GREEN)[*] Extraindo credenciais expostas...$(NC)"
-	@bash extract-credentials.sh
+	@bash scripts/extract-credentials.sh
 	@echo "$(GREEN)[+] Credenciais extraídas com sucesso!$(NC)"
 
 test:
 	@echo "$(GREEN)[*] Testando lab setup...$(NC)"
-	@bash test-lab.sh
+	@bash scripts/test-lab.sh
 
 bruteforce:
 	@echo "$(GREEN)[*] Iniciando bruteforce SSH...$(NC)"
-	@bash bruteforce-ssh.sh localhost 22
+	@bash scripts/bruteforce-ssh.sh localhost 22
 
 start:
 	@echo "$(GREEN)[*] Iniciando aplicação Next.js (nextjs-lab)...$(NC)"

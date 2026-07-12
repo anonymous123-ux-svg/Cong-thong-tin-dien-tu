@@ -6,8 +6,8 @@
 
 set -e
 
-# Diretório do projeto = diretório onde este script está (funciona em qualquer host)
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Diretório do projeto = raiz do repositório (este script vive em scripts/)
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "[*] Iniciando setup do Apache..."
 echo "[*] Diretório do projeto: ${PROJECT_DIR}"

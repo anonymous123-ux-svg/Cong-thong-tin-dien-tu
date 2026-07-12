@@ -18,7 +18,7 @@ Todos os scripts necessários para transformar este repositório em um lab de se
 
 ### Opção 1: Automático Completo (Recomendado)
 ```bash
-sudo bash setup-full-lab.sh
+sudo bash scripts/setup-full-lab.sh
 ```
 
 ### Opção 2: Via Makefile
@@ -28,9 +28,9 @@ sudo make setup
 
 ### Opção 3: Manual
 ```bash
-sudo bash setup-webserver.sh    # ~5 min
-sudo bash setup-ssh.sh          # ~1 min
-bash extract-credentials.sh     # ~1 min
+sudo bash scripts/setup-webserver.sh    # ~5 min
+sudo bash scripts/setup-ssh.sh          # ~1 min
+bash scripts/extract-credentials.sh     # ~1 min
 ```
 
 ## ✨ O Que Cada Script Faz
@@ -242,7 +242,7 @@ sudo journalctl -u ssh -f
 
 ```bash
 # Tudo em uma linha
-sudo bash setup-full-lab.sh && make test
+sudo bash scripts/setup-full-lab.sh && make test
 ```
 
 **Tempo total**: ~10-15 minutos (dependendo de internet para npm install)

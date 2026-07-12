@@ -15,7 +15,7 @@ Um conjunto completo de scripts para configurar um ambiente de teste de seguran�
 ## 🚀 Instalação Rápida (Um Comando)
 
 ```bash
-sudo bash setup-full-lab.sh
+sudo bash scripts/setup-full-lab.sh
 ```
 
 Isto irá automaticamente:
@@ -32,17 +32,17 @@ Se preferir executar manualmente:
 
 ### Passo 1: Setup do Webserver
 ```bash
-sudo bash setup-webserver.sh
+sudo bash scripts/setup-webserver.sh
 ```
 
 ### Passo 2: Setup do SSH
 ```bash
-sudo bash setup-ssh.sh
+sudo bash scripts/setup-ssh.sh
 ```
 
 ### Passo 3: Extrair Credenciais
 ```bash
-bash extract-credentials.sh
+bash scripts/extract-credentials.sh
 ```
 
 ### Passo 4: Aplicação já está rodando
@@ -56,7 +56,7 @@ sudo systemctl status nextjs-lab
 
 ### Verificar Setup
 ```bash
-bash test-lab.sh
+bash scripts/test-lab.sh
 ```
 
 ### Etapa 1: Descobrir Vulnerabilidade (OSINT/FUZZING)
@@ -86,7 +86,7 @@ public/backup/
 
 ```bash
 # Já feito automaticamente, mas pode regenerar:
-bash extract-credentials.sh
+bash scripts/extract-credentials.sh
 
 # Visualizar usernames descobertos
 cat fuzzing-output/combined-usernames.txt
@@ -99,10 +99,10 @@ cat fuzzing-output/bruteforce-wordlist.txt
 
 #### Opção A: Script Automatizado
 ```bash
-bash bruteforce-ssh.sh [host] [porta] [usernames-file] [passwords-file]
+bash scripts/bruteforce-ssh.sh [host] [porta] [usernames-file] [passwords-file]
 
 # Exemplo padrão:
-bash bruteforce-ssh.sh localhost 22
+bash scripts/bruteforce-ssh.sh localhost 22
 ```
 
 #### Opção B: Usando Hydra
@@ -171,19 +171,28 @@ que faz parte da wordlist **rockyou.txt** — ou seja, é quebrável por brute-f
 ## 📁 Estrutura de Arquivos Criados
 
 ```
-/home/dpr-beo/REACT2SHELL-WEB-VULN/
-├── setup-webserver.sh          # Setup Apache + Node.js
-├── setup-ssh.sh                # Setup SSH + criar usuários
-├── setup-full-lab.sh           # Script automatizado completo
-├── extract-credentials.sh      # Extrair credenciais expostas
-├── test-lab.sh                 # Testar configuração
-├── bruteforce-ssh.sh           # Simular bruteforce SSH
+Cong-thong-tin-dien-tu/
+├── scripts/
+│   ├── setup-webserver.sh          # Setup Apache (proxy Next.js)
+│   ├── setup-ssh.sh                # Setup SSH + criar usuários
+│   ├── setup-full-lab.sh           # Script automatizado completo
+│   ├── extract-credentials.sh      # Extrair credenciais expostas
+│   ├── test-lab.sh                 # Testar configuração
+│   ├── bruteforce-ssh.sh           # Simular bruteforce SSH
+│   ├── install-postgres-db-server.sh
+│   ├── setup-lab-docker-postgres.sh
+│   └── setup-lab-server-postgres.sh
+├── docs/
+│   ├── SETUP-LAB-README.md         # Este arquivo
+│   ├── SCRIPTS-SUMMARY.md          # Resumo dos scripts
+│   ├── DATABASE_SETUP.md           # Setup do banco de dados
+│   └── REACT2SHELL_CONTEXT.md      # Contexto do cenário
 ├── fuzzing-output/
 │   ├── combined-usernames.txt       # Usernames únicos extraídos
 │   ├── bruteforce-wordlist.txt      # Wordlist de senhas
 │   ├── ssh-bruteforce-guide.txt     # Guia de ferramentas
 │   └── ssh-bruteforce-results.txt   # Resultados dos testes
-└── SETUP-LAB-README.md         # Este arquivo
+└── README.md
 ```
 
 ## 🛠️ Troubleshooting
