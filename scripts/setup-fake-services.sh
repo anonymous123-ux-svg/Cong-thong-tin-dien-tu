@@ -96,7 +96,7 @@ DEFAULT_SERVICES = {
     5900:  b"RFB 003.008\n",                                       # VNC
     5985:  b"",                                                     # WinRM
     6379:  b"-ERR unknown command\r\n",                            # Redis
-    8080:  b"HTTP/1.1 200 OK\r\nServer: Apache/2.4.52\r\n\r\n",    # HTTP-alt
+    8080:  b"HTTP/1.1 200 OK\r\nServer: nginx/1.24.0\r\n\r\n",     # HTTP-alt
     8443:  b"",                                                     # HTTPS-alt
     9000:  b"",                                                     # PHP-FPM / misc
     9092:  b"",                                                     # Kafka
