@@ -264,3 +264,22 @@ npx prisma db push && npx prisma db seed
 | User | `postgres` |
 | Password | `postgres` |
 | Connection string | `postgresql://postgres:postgres@localhost:5432/dichvucong` |
+
+### Tài khoản chỉ-đọc `readonly_auditor` (mục tiêu post-exploitation)
+
+`scripts/install-postgres-db-server.sh` còn tạo thêm một role **chỉ-đọc** khớp đúng
+với cặp `DB_USER` / `DB_PASS` bị lộ trong `.env` của máy app. Sau khi RCE và đọc
+`.env`, người tấn công dùng cặp này để pivot vào PostgreSQL nội bộ và đọc (SELECT)
+toàn bộ bảng `User`, `HoSo` — nhưng **không** ghi/sửa được.
+
+| Thông số | Giá trị |
+|---|---|
+| User | `readonly_auditor` |
+| Password | `Learning@2026!` |
+| Quyền | `CONNECT` + `SELECT` trên toàn bộ bảng schema `public` (kể cả bảng tạo sau) |
+
+```bash
+# Từ máy app (đã có sẵn postgresql-client nhờ setup-webserver.sh)
+psql -h <DB_INTERNAL_HOST> -p 5432 -U readonly_auditor -d dichvucong
+# password: Learning@2026!
+```

@@ -20,6 +20,12 @@ apt-get update -y
 echo "[*] Đang cài đặt Apache2..."
 apt-get install -y apache2
 
+# Cài đặt PostgreSQL client (psql) trên web server.
+# Cho phép người tấn công, sau khi RCE và đọc .env, dùng ngay `psql` để pivot
+# vào PostgreSQL nội bộ bằng thông tin readonly_auditor bị lộ.
+echo "[*] Đang cài đặt PostgreSQL client (psql)..."
+apt-get install -y postgresql-client
+
 # Bật các module cần thiết
 a2enmod proxy
 a2enmod proxy_http
