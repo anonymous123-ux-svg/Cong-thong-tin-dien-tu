@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 DEFAULT_DB_PORT="${DB_PORT:-5432}"
-DEFAULT_DB_NAME="${DB_NAME:-dichvucong}"
+DEFAULT_DB_NAME="${DB_NAME:-dichvutracuu}"
 DEFAULT_DB_USER="${DB_USER:-postgres}"
 DEFAULT_DB_PASSWORD="${DB_PASSWORD:-postgres}"
 DEFAULT_APP_HOST="${APP_HOST:-127.0.0.1}"

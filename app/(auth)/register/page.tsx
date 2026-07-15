@@ -16,7 +16,7 @@ export default function RegisterPage() {
               Đăng ký tài khoản
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              Tạo tài khoản công dân để sử dụng dịch vụ công trực tuyến.
+              Tạo tài khoản công dân để sử dụng dịch vụ tra cứu trực tuyến.
             </p>
           </div>
 

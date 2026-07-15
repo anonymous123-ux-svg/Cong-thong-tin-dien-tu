@@ -4,13 +4,13 @@ import { layDanhSachDichVu } from "@/lib/actions/dich-vu"
 import PortalHeader from "@/components/portal/PortalHeader"
 import PortalFooter from "@/components/portal/PortalFooter"
 
-export default async function DichVuCongPage() {
+export default async function DichVuTraCuuPage() {
   const [session, dichVuList] = await Promise.all([auth(), layDanhSachDichVu()])
   const traCuuHref = session?.user ? "/tra-cuu" : "/login"
 
   return (
     <div className="flex min-h-screen flex-col">
-      <PortalHeader active="dich-vu-cong" />
+      <PortalHeader active="dich-vu-tra-cuu" />
 
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-3 text-sm text-slate-500">
@@ -18,12 +18,12 @@ export default async function DichVuCongPage() {
             Trang chủ
           </Link>
           <span className="mx-2">/</span>
-          <span className="font-medium text-slate-700">Dịch vụ công trực tuyến</span>
+          <span className="font-medium text-slate-700">Dịch vụ tra cứu trực tuyến</span>
         </div>
       </div>
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <h1 className="text-2xl font-bold text-slate-800">Dịch vụ công trực tuyến</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Dịch vụ tra cứu trực tuyến</h1>
         <p className="mt-1 text-sm text-slate-500">
           Danh sách thủ tục hành chính có thể thực hiện trực tuyến toàn trình hoặc một phần.
         </p>

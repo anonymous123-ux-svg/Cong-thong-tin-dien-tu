@@ -24,7 +24,7 @@ export default async function PublicHomePage() {
       <section className="bg-gradient-to-b from-[#1567c8] to-[#0b4ea2] text-white">
         <div className="mx-auto max-w-6xl px-4 py-12 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold">
-            Cổng Dịch vụ công
+            Cổng Dịch vụ tra cứu
           </h1>
           <p className="mx-auto mt-2 max-w-2xl text-blue-100">
             Nơi người dân và doanh nghiệp thực hiện, theo dõi và tra cứu hồ sơ
@@ -55,7 +55,7 @@ export default async function PublicHomePage() {
 
       {/* Dịch vụ nổi bật */}
       <section className="mx-auto w-full max-w-6xl px-4 py-12">
-        <h2 className="text-xl font-bold text-slate-800">Dịch vụ công nổi bật</h2>
+        <h2 className="text-xl font-bold text-slate-800">Dịch vụ tra cứu nổi bật</h2>
         <p className="mt-1 text-sm text-slate-500">
           Các thủ tục hành chính được người dân sử dụng nhiều nhất.
         </p>

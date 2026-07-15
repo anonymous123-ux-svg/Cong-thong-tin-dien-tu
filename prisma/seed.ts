@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs"
 const pool = new Pool({
   connectionString:
     process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/dichvucong",
+    "postgresql://postgres:postgres@localhost:5432/dichvutracuu",
 })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
@@ -23,7 +23,7 @@ async function main() {
   // Tài khoản cán bộ quản trị
   const canBo = await prisma.user.create({
     data: {
-      email: "canbo@dichvucong.gov.vn",
+      email: "canbo@dichvutracuu.gov.vn",
       hoTen: "Nguyễn Văn Cán Bộ",
       passwordHash,
       role: "CAN_BO",
@@ -33,7 +33,7 @@ async function main() {
   // Tài khoản quản trị viên hệ thống (trang /admin — không có link điều hướng, chỉ tìm được bằng fuzzing)
   const admin = await prisma.user.create({
     data: {
-      email: "admin@dichvucong.gov.vn",
+      email: "admin@dichvutracuu.gov.vn",
       hoTen: "Quản trị viên hệ thống",
       passwordHash,
       role: "ADMIN",
@@ -43,14 +43,14 @@ async function main() {
   // Tài khoản công dân mẫu (dùng để đăng nhập và tra cứu)
   const congDan = await prisma.user.create({
     data: {
-      email: "congdan@dichvucong.gov.vn",
+      email: "congdan@dichvutracuu.gov.vn",
       hoTen: "Trần Thị Công Dân",
       passwordHash,
       role: "CONG_DAN",
     },
   })
 
-  // Hồ sơ dịch vụ công mẫu
+  // Hồ sơ dịch vụ tra cứu mẫu
   const seedHoSo = [
     {
       maHoSo: "000.00.01.H29-240115-0001",
@@ -91,7 +91,7 @@ async function main() {
     await prisma.hoSo.create({ data: h })
   }
 
-  // Danh mục dịch vụ công trực tuyến (trang /dich-vu-cong)
+  // Danh mục dịch vụ tra cứu trực tuyến (trang /dich-vu-tra-cuu)
   const seedDichVu = [
     { ten: "Cấp đổi giấy phép lái xe", coQuan: "Bộ Giao thông Vận tải", linhVuc: "Giao thông vận tải" },
     { ten: "Đăng ký khai sinh", coQuan: "Bộ Tư pháp", linhVuc: "Tư pháp - Hộ tịch" },
@@ -113,7 +113,7 @@ async function main() {
     data: [
       {
         loaiDichVu: "FTP",
-        hostname: "ftp-noibo.dichvucong.lab",
+        hostname: "ftp-noibo.dichvutracuu.lab",
         port: 21,
         username: "svc_hoso_ftp",
         matKhau: "Lab_Ftp_2026!",
@@ -122,16 +122,16 @@ async function main() {
       },
       {
         loaiDichVu: "SSH",
-        hostname: "app-backend.dichvucong.lab",
+        hostname: "app-backend.dichvutracuu.lab",
         port: 22,
         username: "svc_deploy",
         matKhau: "Lab_Ssh_Deploy_2026!",
-        ghiChu: "Tài khoản CI/CD dùng để deploy ứng dụng cổng dịch vụ công.",
+        ghiChu: "Tài khoản CI/CD dùng để deploy ứng dụng cổng dịch vụ tra cứu.",
         userId: admin.id,
       },
       {
         loaiDichVu: "SSH",
-        hostname: "db-internal.dichvucong.lab",
+        hostname: "db-internal.dichvutracuu.lab",
         port: 22,
         username: "svc_db_admin",
         matKhau: "Lab_Db_Admin_2026!",

@@ -1,12 +1,12 @@
 -- =============================================================================
--- dichvucong — PostgreSQL Init Script
+-- dichvutracuu — PostgreSQL Init Script
 -- Dùng để khởi tạo schema + seed data cho bài lab React2Shell (CVE-2025-55182)
 --
 -- Cách dùng:
---   psql -U postgres -d dichvucong -f database/init.sql
+--   psql -U postgres -d dichvutracuu -f database/init.sql
 --
 -- Hoặc trong container:
---   docker exec -i dichvucong-db psql -U postgres -d dichvucong < database/init.sql
+--   docker exec -i dichvutracuu-db psql -U postgres -d dichvutracuu < database/init.sql
 --
 -- LƯU Ý: Script này dùng pgcrypto để tạo bcrypt hash trực tiếp trong SQL.
 --         Nếu extension chưa có, chạy dòng đầu tiên với quyền superuser.
@@ -42,7 +42,7 @@ CREATE TABLE "User" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- =============================================================================
--- 4. BẢNG HoSo (Hồ sơ dịch vụ công)
+-- 4. BẢNG HoSo (Hồ sơ dịch vụ tra cứu)
 -- =============================================================================
 CREATE TABLE "HoSo" (
     "id"            TEXT             NOT NULL,
@@ -77,7 +77,7 @@ ALTER TABLE "HoSo"
 INSERT INTO "User" ("id", "email", "hoTen", "passwordHash", "role")
 VALUES (
     'user_canbo_001',
-    'canbo@dichvucong.gov.vn',
+    'canbo@dichvutracuu.gov.vn',
     'Nguyễn Văn Cán Bộ',
     crypt('password123', gen_salt('bf', 10)),
     'CAN_BO'
@@ -87,13 +87,13 @@ VALUES (
 INSERT INTO "User" ("id", "email", "hoTen", "passwordHash", "role")
 VALUES (
     'user_congdan_001',
-    'congdan@dichvucong.gov.vn',
+    'congdan@dichvutracuu.gov.vn',
     'Trần Thị Công Dân',
     crypt('password123', gen_salt('bf', 10)),
     'CONG_DAN'
 );
 
--- 5c. Hồ sơ dịch vụ công mẫu
+-- 5c. Hồ sơ dịch vụ tra cứu mẫu
 INSERT INTO "HoSo" (
     "id", "maHoSo", "thuTuc", "coQuan", "linhVuc",
     "nguoiNop", "tinhTrang", "ngayTiepNhan", "ngayHenTra", "ownerId"

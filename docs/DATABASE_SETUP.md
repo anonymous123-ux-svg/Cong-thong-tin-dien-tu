@@ -12,9 +12,9 @@ Next.js App (port 3000)
     │  DATABASE_URL (env)
     ▼
 PostgreSQL (port 5432)
-    └── database: dichvucong
+    └── database: dichvutracuu
         ├── User    (tài khoản đăng nhập)
-        └── HoSo    (hồ sơ dịch vụ công — dữ liệu tra cứu)
+        └── HoSo    (hồ sơ dịch vụ tra cứu — dữ liệu tra cứu)
 ```
 
 **Stack:**
@@ -36,12 +36,12 @@ PostgreSQL (port 5432)
 docker compose up -d
 ```
 
-Container `dichvucong-db` sẽ chạy PostgreSQL 16 tại `localhost:5432`.
+Container `dichvutracuu-db` sẽ chạy PostgreSQL 16 tại `localhost:5432`.
 
 Kiểm tra:
 ```bash
 docker compose ps
-# dichvucong-db   running   0.0.0.0:5432->5432/tcp
+# dichvutracuu-db   running   0.0.0.0:5432->5432/tcp
 ```
 
 ### Bước 2: Cấu hình biến môi trường
@@ -53,7 +53,7 @@ cp .env.example .env
 Mở `.env` và đặt các giá trị:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/dichvucong"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/dichvutracuu"
 AUTH_SECRET="k8sJ3mP9xR2vL5nQ7wF0yT4uA6bD1eH"
 APP_HOST=<IP-máy-chạy-app>
 AUTH_TRUST_HOST=true
@@ -87,8 +87,8 @@ Sau khi chạy, database có:
 
 | Email | Mật khẩu | Vai trò |
 |---|---|---|
-| `congdan@dichvucong.gov.vn` | `password123` | CONG_DAN |
-| `canbo@dichvucong.gov.vn` | `password123` | CAN_BO |
+| `congdan@dichvutracuu.gov.vn` | `password123` | CONG_DAN |
+| `canbo@dichvutracuu.gov.vn` | `password123` | CAN_BO |
 
 Kèm theo 3 hồ sơ mẫu để tra cứu (mã `000.00.01.H29-...`).
 
@@ -124,17 +124,17 @@ docker compose up -d
 
 # Bare-metal (Ubuntu/Debian)
 sudo systemctl start postgresql
-sudo -u postgres createdb dichvucong
+sudo -u postgres createdb dichvutracuu
 ```
 
 ### Bước 2: Chạy init.sql
 
 ```bash
 # Qua Docker
-docker exec -i dichvucong-db psql -U postgres -d dichvucong < database/init.sql
+docker exec -i dichvutracuu-db psql -U postgres -d dichvutracuu < database/init.sql
 
 # Bare-metal
-psql -U postgres -d dichvucong -f database/init.sql
+psql -U postgres -d dichvutracuu -f database/init.sql
 ```
 
 Script `database/init.sql` sẽ:
@@ -157,7 +157,7 @@ Thực hiện Bước 2, 3, 6 như Cách 1.
 
 ```bash
 # Qua Docker
-docker exec -it dichvucong-db psql -U postgres -d dichvucong
+docker exec -it dichvutracuu-db psql -U postgres -d dichvutracuu
 
 # Kiểm tra bảng
 \dt
@@ -171,15 +171,15 @@ SELECT email, role FROM "User";
 ```
              email              |   role
 --------------------------------+----------
- congdan@dichvucong.gov.vn      | CONG_DAN
- canbo@dichvucong.gov.vn        | CAN_BO
+ congdan@dichvutracuu.gov.vn      | CONG_DAN
+ canbo@dichvutracuu.gov.vn        | CAN_BO
 (2 rows)
 ```
 
 ### Từ ứng dụng Next.js
 
 Đăng nhập tại `http://<APP_HOST>:3000/login` với:
-- Email: `congdan@dichvucong.gov.vn`
+- Email: `congdan@dichvutracuu.gov.vn`
 - Mật khẩu: `password123`
 
 Sau đó vào `/tra-cuu` và tra cứu mã hồ sơ `000.00.01.H29-260310-0420`.
@@ -241,7 +241,7 @@ npx prisma db seed          # seed lại
 
 ```bash
 sudo -u postgres psql -c "CREATE ROLE postgres SUPERUSER LOGIN PASSWORD 'postgres';"
-sudo -u postgres psql -c "CREATE DATABASE dichvucong OWNER postgres;"
+sudo -u postgres psql -c "CREATE DATABASE dichvutracuu OWNER postgres;"
 ```
 
 ### Reset database về trạng thái ban đầu
@@ -260,10 +260,10 @@ npx prisma db push && npx prisma db seed
 |---|---|
 | Host | `localhost` (hoặc IP máy target) |
 | Port | `5432` |
-| Database | `dichvucong` |
+| Database | `dichvutracuu` |
 | User | `postgres` |
 | Password | `postgres` |
-| Connection string | `postgresql://postgres:postgres@localhost:5432/dichvucong` |
+| Connection string | `postgresql://postgres:postgres@localhost:5432/dichvutracuu` |
 
 ### Tài khoản chỉ-đọc `readonly_auditor` (mục tiêu post-exploitation)
 
@@ -280,6 +280,6 @@ toàn bộ bảng `User`, `HoSo` — nhưng **không** ghi/sửa được.
 
 ```bash
 # Từ máy app (đã có sẵn postgresql-client nhờ setup-webserver.sh)
-psql -h <DB_INTERNAL_HOST> -p 5432 -U readonly_auditor -d dichvucong
+psql -h <DB_INTERNAL_HOST> -p 5432 -U readonly_auditor -d dichvutracuu
 # password: Learning@2026!
 ```

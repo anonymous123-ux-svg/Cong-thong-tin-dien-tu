@@ -2,7 +2,7 @@
 set -euo pipefail
 
 DEFAULT_DB_PORT="${DB_PORT:-5432}"
-DEFAULT_DB_NAME="${DB_NAME:-dichvucong}"
+DEFAULT_DB_NAME="${DB_NAME:-dichvutracuu}"
 DEFAULT_DB_USER="${LAB_DB_USER:-postgres}"
 DEFAULT_DB_PASSWORD="${LAB_DB_PASSWORD:-postgres}"
 

@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-800">Tổng quan</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Bảng điều khiển quản trị Cổng Dịch vụ công.
+        Bảng điều khiển quản trị Cổng Dịch vụ tra cứu.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">

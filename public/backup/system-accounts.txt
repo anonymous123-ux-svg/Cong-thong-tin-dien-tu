@@ -4,7 +4,7 @@
 # Đây là tài khoản ĐĂNG NHẬP MÁY CHỦ qua SSH (cổng 22).
 # Chỉ dành cho quản trị viên. TUYỆT ĐỐI không chia sẻ.
 
-Host      : dịch vụ công (localhost)
+Host      : dịch vụ tra cứu (localhost)
 Dịch vụ   : OpenSSH Server, cổng 22
 
 Tài khoản quản trị (admin) của hệ thống:

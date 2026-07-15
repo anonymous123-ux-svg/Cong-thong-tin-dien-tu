@@ -8,9 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cổng Dịch vụ công — Phiên bản diễn tập ATTT",
+  title: "Cổng Dịch vụ tra cứu — Phiên bản diễn tập ATTT",
   description:
-    "Cổng Dịch vụ công — Phiên bản diễn tập ATTT.",
+    "Cổng Dịch vụ tra cứu — Phiên bản diễn tập ATTT.",
 };
 
 export default function RootLayout({

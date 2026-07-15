@@ -1,4 +1,4 @@
-# Danh sách tài khoản NGƯỜI DÙNG cổng dịch vụ công (web portal)
+# Danh sách tài khoản NGƯỜI DÙNG cổng dịch vụ tra cứu (web portal)
 # Đây là tài khoản đăng nhập ứng dụng web, KHÔNG phải tài khoản máy chủ.
 id,username,ho_ten,vai_tro
 1001,canbo,Nguyen Van Can,can_bo

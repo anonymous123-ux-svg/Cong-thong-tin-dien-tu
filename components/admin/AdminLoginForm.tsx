@@ -64,7 +64,7 @@ export default function AdminLoginForm() {
           autoComplete="username"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="admin@dichvucong.gov.vn"
+          placeholder="admin@dichvutracuu.gov.vn"
           className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 py-2.5 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/30"
         />
       </div>

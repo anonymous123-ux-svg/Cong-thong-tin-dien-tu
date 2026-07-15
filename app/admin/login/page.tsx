@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import AdminLoginForm from "@/components/admin/AdminLoginForm"
 
 export const metadata = {
-  title: "Đăng nhập Quản trị — Cổng Dịch vụ công",
+  title: "Đăng nhập Quản trị — Cổng Dịch vụ tra cứu",
 }
 
 /**
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
             Bảng điều khiển Quản trị
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Cổng Dịch vụ công · Khu vực dành cho quản trị viên hệ thống
+            Cổng Dịch vụ tra cứu · Khu vực dành cho quản trị viên hệ thống
           </p>
         </div>
 

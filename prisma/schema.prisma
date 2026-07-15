@@ -18,7 +18,7 @@ model User {
   dichVuNoiBo  DichVuNoiBo[]
 }
 
-// Hồ sơ dịch vụ công (dossier) — tra cứu sau khi đăng nhập
+// Hồ sơ dịch vụ tra cứu (dossier) — tra cứu sau khi đăng nhập
 model HoSo {
   id           String   @id @default(cuid())
   maHoSo       String   @unique
@@ -54,7 +54,7 @@ model PhanAnh {
   user          User?    @relation(fields: [userId], references: [id])
 }
 
-// Danh mục dịch vụ công trực tuyến hiển thị công khai
+// Danh mục dịch vụ tra cứu trực tuyến hiển thị công khai
 model DichVu {
   id      String  @id @default(cuid())
   ten     String

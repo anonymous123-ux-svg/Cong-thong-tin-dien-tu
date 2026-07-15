@@ -28,7 +28,7 @@ export type TraCuuState = {
 }
 
 /**
- * Tra cứu hồ sơ dịch vụ công theo mã hồ sơ.
+ * Tra cứu hồ sơ dịch vụ tra cứu theo mã hồ sơ.
  *
  * ============================================================================
  *  VULNERABLE SERVER ACTION — CVE-2025-55182 (React2Shell)

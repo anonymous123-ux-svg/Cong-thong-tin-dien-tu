@@ -54,7 +54,7 @@ export default function LoginForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="congdan@dichvucong.gov.vn"
+          placeholder="congdan@dichvutracuu.gov.vn"
           className="mt-1.5 w-full rounded-md border border-slate-300 px-3 py-2.5 text-slate-900 outline-none focus:border-[#1567c8] focus:ring-2 focus:ring-[#1567c8]/30"
         />
       </div>

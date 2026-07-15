@@ -5,8 +5,8 @@ import type { NextAuthConfig } from "next-auth"
  * Used by middleware to validate sessions without importing pg/bcrypt.
  * Full provider config with DB logic lives in auth.ts.
  *
- * Routing model for the Cổng Dịch vụ công portal:
- *  - Public routes: "/", "/login", "/register", "/dich-vu-cong", "/phan-anh-kien-nghi"
+ * Routing model for the Cổng Dịch vụ tra cứu portal:
+ *  - Public routes: "/", "/login", "/register", "/dich-vu-tra-cuu", "/phan-anh-kien-nghi"
  *  - Everything else (including the vulnerable "/tra-cuu" lookup and "/admin") requires login.
  *  - "/admin" additionally requires the ADMIN role — that finer-grained check is enforced
  *    in app/admin/layout.tsx (not here), so an authenticated non-admin gets a 403 instead of
@@ -25,7 +25,7 @@ export const authConfig = {
         nextUrl.pathname === "/login" ||
         nextUrl.pathname === "/register" ||
         nextUrl.pathname === "/admin/login" ||
-        nextUrl.pathname === "/dich-vu-cong" ||
+        nextUrl.pathname === "/dich-vu-tra-cuu" ||
         nextUrl.pathname === "/phan-anh-kien-nghi" ||
         // Thư mục backup bị lộ ("nhạy cảm") — cố ý cho truy cập ẩn danh để
         // học viên dò/tải file bằng ffuf/gobuster. Đây là lỗ hổng chủ đích.

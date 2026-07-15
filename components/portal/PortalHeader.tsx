@@ -6,7 +6,7 @@ import EmblemStar from "./EmblemStar"
 export default async function PortalHeader({
   active,
 }: {
-  active?: "home" | "tra-cuu" | "dich-vu-cong" | "phan-anh-kien-nghi"
+  active?: "home" | "tra-cuu" | "dich-vu-tra-cuu" | "phan-anh-kien-nghi"
 }) {
   const session = await auth()
   const user = session?.user
@@ -33,14 +33,14 @@ export default async function PortalHeader({
             <div className="leading-tight">
               <div className="flex items-center gap-2 flex-wrap">
                 <div className="text-lg sm:text-xl font-bold uppercase tracking-wide">
-                  Cổng Dịch vụ công
+                  Cổng Dịch vụ tra cứu
                 </div>
                 <span className="rounded bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#7a3b00]">
                   Phiên bản diễn tập ATTT
                 </span>
               </div>
               <div className="text-[11px] sm:text-xs text-blue-100">
-                Kết nối, cung cấp thông tin và dịch vụ công mọi lúc, mọi nơi
+                Kết nối, cung cấp thông tin và dịch vụ tra cứu mọi lúc, mọi nơi
               </div>
             </div>
           </Link>
@@ -103,12 +103,12 @@ export default async function PortalHeader({
             Tra cứu hồ sơ
           </Link>
           <Link
-            href="/dich-vu-cong"
+            href="/dich-vu-tra-cuu"
             className={`px-4 py-2.5 font-medium hover:bg-white/10 transition ${
-              active === "dich-vu-cong" ? "bg-white/15" : ""
+              active === "dich-vu-tra-cuu" ? "bg-white/15" : ""
             }`}
           >
-            Dịch vụ công trực tuyến
+            Dịch vụ tra cứu trực tuyến
           </Link>
           <Link
             href="/phan-anh-kien-nghi"

@@ -13,7 +13,7 @@ const navItems = [
 
 /**
  * Khu vực quản trị (/admin) — KHÔNG có liên kết ở bất kỳ menu điều hướng công
- * khai nào của cổng dịch vụ công. Route này chỉ được phát hiện bằng cách dò
+ * khai nào của cổng dịch vụ tra cứu. Route này chỉ được phát hiện bằng cách dò
  * quét đường dẫn (gobuster/ffuf/dirb...), đúng với kịch bản huấn luyện Red Team
  * của lab. Việc bảo vệ vẫn dựa trên xác thực + phân quyền ADMIN thật sự bên
  * dưới — bảo mật không dựa vào việc "giấu" đường dẫn.
@@ -35,7 +35,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <div className="text-xs uppercase tracking-wide text-slate-400">
             Quản trị hệ thống
           </div>
-          <div className="font-bold">Cổng Dịch vụ công</div>
+          <div className="font-bold">Cổng Dịch vụ tra cứu</div>
         </div>
 
         <nav className="flex-1 px-2 py-4 text-sm">

@@ -148,7 +148,7 @@ Cong-thong-tin-dien-tu/
 | File | Vị trí | Nội dung |
 |------|--------|----------|
 | system-accounts.txt | `/backup/system-accounts.txt` | tài khoản quản trị máy chủ |
-| portal-users.txt | `/backup/portal-users.txt` | tài khoản người dùng cổng dịch vụ |
+| portal-users.txt | `/backup/portal-users.txt` | tài khoản người dùng cổng dịch vụ tra cứu |
 | database-dump.txt | `/backup/database-dump.txt` | trích xuất một phần cơ sở dữ liệu |
 | notes.txt | `/backup/notes.txt` | ghi chú vận hành |
 

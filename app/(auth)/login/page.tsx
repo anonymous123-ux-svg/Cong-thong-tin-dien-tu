@@ -13,7 +13,7 @@ export default function LoginPage() {
           <div className="mb-6 flex flex-col items-center text-center">
             <EmblemStar size={56} />
             <h1 className="mt-3 text-xl font-bold text-slate-800">
-              Đăng nhập Cổng Dịch vụ công
+              Đăng nhập Cổng Dịch vụ tra cứu
             </h1>
             <p className="mt-1 text-sm text-slate-500">
               Sử dụng tài khoản để truy cập và tra cứu hồ sơ.

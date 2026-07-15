@@ -115,7 +115,7 @@ _MEMCACHED = (
 DEFAULT_SERVICES = {
     21:    b"220 (vsFTPd 3.0.5)\r\n",                              # FTP
     23:    b"\xff\xfd\x18\xff\xfd\x1f Ubuntu 22.04.3 LTS login: ", # Telnet
-    25:    b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n",  # SMTP
+    25:    b"220 mail.dichvutracuu.local ESMTP Postfix (Ubuntu)\r\n",  # SMTP
     53:    b"",                                                     # DNS (nhị phân)
     110:   b"+OK Dovecot (Ubuntu) ready.\r\n",                     # POP3
     111:   b"",                                                     # rpcbind (RPC)
@@ -125,8 +125,8 @@ DEFAULT_SERVICES = {
     389:   b"",                                                     # LDAP (nhị phân)
     443:   b"",                                                     # HTTPS (TLS)
     445:   b"",                                                     # SMB (nhị phân)
-    465:   b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n", # SMTPS
-    587:   b"220 mail.dichvucong.local ESMTP Postfix (Ubuntu)\r\n", # Submission
+    465:   b"220 mail.dichvutracuu.local ESMTP Postfix (Ubuntu)\r\n", # SMTPS
+    587:   b"220 mail.dichvutracuu.local ESMTP Postfix (Ubuntu)\r\n", # Submission
     993:   b"",                                                     # IMAPS (TLS)
     995:   b"",                                                     # POP3S (TLS)
     1433:  b"",                                                     # MSSQL (nhị phân)

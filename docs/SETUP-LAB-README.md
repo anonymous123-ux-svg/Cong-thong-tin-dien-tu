@@ -69,7 +69,7 @@ curl http://localhost/backup/
 # Xem tài khoản quản trị máy chủ (chứa username SSH bị lộ)
 curl http://localhost/backup/system-accounts.txt
 
-# Xem tài khoản người dùng cổng dịch vụ (mồi nhử)
+# Xem tài khoản người dùng cổng dịch vụ tra cứu (mồi nhử)
 curl http://localhost/backup/portal-users.txt
 ```
 
@@ -77,7 +77,7 @@ Các file bị lộ nằm trong:
 ```
 public/backup/
 ├── system-accounts.txt   # Tài khoản quản trị máy chủ (username SSH bị lộ)
-├── portal-users.txt      # Tài khoản người dùng cổng dịch vụ (mồi nhử)
+├── portal-users.txt      # Tài khoản người dùng cổng dịch vụ tra cứu (mồi nhử)
 ├── database-dump.txt     # Trích xuất một phần cơ sở dữ liệu
 ├── notes.txt             # Ghi chú vận hành
 └── README.txt            # Mô tả thư mục backup

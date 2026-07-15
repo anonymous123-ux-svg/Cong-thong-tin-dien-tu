@@ -8,7 +8,7 @@ export default async function AdminNguoiDungPage() {
     <div>
       <h1 className="text-2xl font-bold text-slate-800">Quản lý người dùng</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Danh sách tài khoản đã đăng ký trên cổng dịch vụ công.
+        Danh sách tài khoản đã đăng ký trên cổng dịch vụ tra cứu.
       </p>
 
       <div className="mt-6">

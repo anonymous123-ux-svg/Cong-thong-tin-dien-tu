@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-dichvucong}"
+DB_NAME="${DB_NAME:-dichvutracuu}"
 DB_USER="${DB_USER:-postgres}"
 DB_PASSWORD="${DB_PASSWORD:-postgres}"
 APP_HOST="${APP_HOST:-127.0.0.1}"
